@@ -1,0 +1,10 @@
+modules = ["python-3.12"]
+run = "HOST=0.0.0.0 PORT=8080 python3 server.py"
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[deployment]
+run = ["sh", "-c", "HOST=0.0.0.0 PORT=8080 python3 server.py"]
+deploymentTarget = "autoscale"

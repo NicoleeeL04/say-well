@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7f9">
+  <title>My symptom history · Say Well</title>
+  <link rel="stylesheet" href="flow.css?v=concise-1">
+  <link rel="stylesheet" href="history.css?v=history-clean-2">
+</head>
+<body class="history-page">
+<a class="skip-link" href="#page-title">Skip to main content</a>
+<header class="app-header">
+  <a class="brand" href="./" aria-label="Say Well home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M7 7h18v13H15l-8 6V7Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 13h10M11 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>say well<span class="brand-dot">.</span></span></a>
+  <nav class="page-nav" aria-label="Pages"><a href="./" class="secondary">New description</a><a href="history.html" class="secondary is-current" aria-current="page">My history</a></nav>
+</header>
+<main>
+  <p id="demo-banner" class="demo-banner" hidden><strong>Sample data</strong> <a href="history.html">View my real history</a></p>
+  <div class="history-intro">
+    <h1 id="page-title" tabindex="-1">My history</h1>
+    
+  </div>
+
+  <section id="empty" class="card history-empty-card" hidden>
+    <h2>No saved entries yet</h2>
+    <div class="actions"><a class="primary button-link" href="./">New description</a><a class="secondary" href="history.html?demo">See an example</a></div>
+  </section>
+
+  <div id="content" hidden>
+    <section class="stat-row" aria-label="Summary">
+      <div class="stat card"><span class="stat-label">Saved entries</span><b id="stat-total">0</b></div>
+      <div class="stat card"><span class="stat-label">Most frequent area</span><b id="stat-area">—</b></div>
+      <div class="stat card"><span class="stat-label">Most common season</span><b id="stat-season">—</b></div>
+      <div class="stat card"><span class="stat-label">Patterns noticed</span><b id="stat-patterns">0</b></div>
+    </section>
+
+
+    <section class="card insights" aria-labelledby="insights-title">
+      <div class="section-heading"><div><h2 id="insights-title">Patterns</h2></div></div>
+      <ul id="insight-list" class="insight-list"></ul>
+      <p class="field-help">Timing and frequency only. Not a diagnosis.</p>
+    </section>
+
+    <div class="history-grid">
+      <section class="card chart-card" aria-labelledby="month-title">
+        <h2 id="month-title">By month</h2>
+        <div class="month-chart" id="month-chart" role="img"></div>
+        <div class="season-row" id="season-row"></div>
+        <table class="sr-only" id="month-table"></table>
+      </section>
+      <section class="card chart-card" aria-labelledby="area-title">
+        <h2 id="area-title">By area</h2>
+        <ul class="area-chart" id="area-chart"></ul>
+      </section>
+    </div>
+
+    <section aria-labelledby="timeline-title" class="timeline-section">
+      <div class="timeline-head"><div><h2 id="timeline-title">Saved descriptions</h2></div><div class="timeline-actions"><button id="export" class="secondary" type="button">Download all</button><button id="clear" class="text-button danger" type="button">Delete all history</button></div></div>
+      <div id="timeline"></div>
+    </section>
+  </div>
+  <div id="tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+  <footer><span>Saved only in this browser. A communication aid, not a diagnosis.</span></footer>
+</main>
+<script type="module" src="history-page.js?v=history-clean-2"></script>
+</body>
+</html>

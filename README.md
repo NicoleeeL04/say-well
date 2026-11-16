@@ -18,6 +18,21 @@ Without an API key, **manual mode** preserves multilingual input but does not tr
 
 To enable multilingual interpretation, put `OPENAI_API_KEY=your-key` in a local `.env` file at the repository root, or set `OPENAI_API_KEY` in your shell environment before starting the server. The `.env` file is ignored by Git; shell settings take precedence. Optionally set `OPENAI_MODEL` (default `gpt-4.1`) and `PORT` (default `8080`). The API key stays on the server. The app asks users to opt in before sending symptom text to OpenAI. They can also switch to manual mode.
 
+## Run with a local model (no API key)
+
+Any OpenAI-compatible server works, including a free local model through [Ollama](https://ollama.com):
+
+```sh
+ollama pull qwen2.5:7b          # ~4.7 GB; use qwen2.5:3b on 8 GB Macs
+cat > .env <<'ENV'
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_MODEL=qwen2.5:7b
+ENV
+python3 server.py               # prints "AI on via http://localhost:11434/v1"
+```
+
+With `OPENAI_BASE_URL` set, no API key is needed, symptom text never leaves the computer, and requests may take longer (up to 180 s). Local models are smaller than GPT-4.1, so rerun `python3 tests/scenario_agent.py` and review translations before relying on them. A hosted deployment (Replit) cannot reach a model on your laptop; it still needs a hosted API key.
+
 ## Deploy (Replit)
 
 Import the GitHub repository into Replit. The included `.replit` runs `HOST=0.0.0.0 PORT=8080 python3 server.py`. Add `OPENAI_API_KEY` under **Secrets** (never commit it), press **Run** to test, then **Deploy** for a public URL. Any host works the same way: set `HOST=0.0.0.0`, `PORT`, and `OPENAI_API_KEY`, then start `python3 server.py`. A public deployment uses your OpenAI key for every visitor, so set a spending limit on the OpenAI account.

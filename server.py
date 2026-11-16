@@ -1,4 +1,5 @@
-"""Local Say Well server. Run: OPENAI_API_KEY=... python3 server.py."""
+"""Local Say Well server. Run: OPENAI_API_KEY=... python3 server.py
+(or OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:7b for a local model)."""
 import json
 import os
 from pathlib import Path
@@ -16,22 +17,45 @@ def load_local_env():
         return
     for line in env_file.read_text().splitlines():
         name, separator, value = line.strip().partition('=')
-        if separator and name in {'OPENAI_API_KEY', 'OPENAI_MODEL', 'PORT'}:
+        if separator and name in {'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_BASE_URL', 'PORT'}:
             os.environ.setdefault(name, value.strip().strip('\"\''))
 
 from interpretation import FIELDS, REGIONS, PROMPT, SCHEMA, TRANSLATION_PROMPT, TRANSLATION_SCHEMA, validate_result
 
 
-def model_json(key, messages, schema, name):
-    payload = {'model': os.environ.get('OPENAI_MODEL', 'gpt-4.1'), 'store': False,
+OPENAI_URL = 'https://api.openai.com/v1'
+
+
+def ai_base_url():
+    # OPENAI_BASE_URL points at any OpenAI-compatible server, e.g. a local
+    # Ollama model at http://localhost:11434/v1. Unset means OpenAI.
+    return (os.environ.get('OPENAI_BASE_URL') or OPENAI_URL).rstrip('/')
+
+
+def ai_configured():
+    return bool(os.environ.get('OPENAI_API_KEY') or os.environ.get('OPENAI_BASE_URL'))
+
+
+def model_request(key, messages, schema, name):
+    base = ai_base_url()
+    payload = {'model': os.environ.get('OPENAI_MODEL', 'gpt-4.1'),
                'temperature': 0.2,
                'response_format': {'type': 'json_schema', 'json_schema': {
                    'name': name, 'strict': True, 'schema': schema}},
                'messages': messages}
-    request = Request('https://api.openai.com/v1/chat/completions',
-                      data=json.dumps(payload).encode(),
-                      headers={'Authorization': 'Bearer '+key, 'Content-Type': 'application/json'})
-    with urlopen(request, timeout=55) as response:
+    if base == OPENAI_URL:
+        payload['store'] = False
+    headers = {'Content-Type': 'application/json'}
+    if key:
+        headers['Authorization'] = 'Bearer '+key
+    return Request(base+'/chat/completions', data=json.dumps(payload).encode(), headers=headers)
+
+
+def model_json(key, messages, schema, name):
+    request = model_request(key, messages, schema, name)
+    # Local models on a laptop are slower than the hosted API.
+    timeout = 55 if ai_base_url() == OPENAI_URL else 180
+    with urlopen(request, timeout=timeout) as response:
         result = json.load(response)
     return json.loads(result['choices'][0]['message']['content'])
 
@@ -68,7 +92,7 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
     def do_GET(self):
         if self.path=='/api/config':
-            return self.send_json(200,{'ai':bool(os.environ.get('OPENAI_API_KEY'))})
+            return self.send_json(200,{'ai':ai_configured()})
         if self.path.startswith('/api/'):
             return self.send_json(404,{'error':'Not found'})
         return super().do_GET()
@@ -82,8 +106,8 @@ class Handler(SimpleHTTPRequestHandler):
         hosts={h for h in (self.headers.get('Host',''),self.headers.get('X-Forwarded-Host','').split(',')[0].strip()) if h}
         if origin and origin not in {f'{scheme}://{h}' for h in hosts for scheme in ('http','https')}:
             return self.send_json(403,{'error':'Origin not allowed'})
-        key=os.environ.get('OPENAI_API_KEY')
-        if not key:
+        key=os.environ.get('OPENAI_API_KEY','')
+        if not ai_configured():
             return self.send_json(503,{'error':'AI interpretation is not configured. Use the manual flow.'})
         try:
             length=int(self.headers.get('Content-Length','0'))
@@ -106,5 +130,5 @@ if __name__=='__main__':
     port=int(os.environ.get('PORT','8080'))
     # Local by default; hosting platforms set HOST=0.0.0.0 to accept outside traffic.
     host=os.environ.get('HOST','127.0.0.1')
-    print(f'Say Well: http://localhost:{port} (AI {"on" if os.environ.get("OPENAI_API_KEY") else "off"})')
+    print(f'Say Well: http://localhost:{port} (AI {"off" if not ai_configured() else "on via "+ai_base_url()})')
     ThreadingHTTPServer((host,port),Handler).serve_forever()

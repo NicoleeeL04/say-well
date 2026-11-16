@@ -62,3 +62,29 @@ class TranslationIsolation(unittest.TestCase):
         self.assertEqual(result['translation'],'Sorry, I meant left, not right.')
 
 if __name__=='__main__':unittest.main()
+
+
+class ModelEndpointTests(unittest.TestCase):
+    def test_default_is_openai_with_key_and_no_store(self):
+        with patch.dict(server.os.environ, {'OPENAI_API_KEY': 'k'}, clear=True):
+            request = server.model_request('k', [], {}, 'x')
+            body = server.json.loads(request.data)
+            self.assertEqual(request.full_url, 'https://api.openai.com/v1/chat/completions')
+            self.assertEqual(request.get_header('Authorization'), 'Bearer k')
+            self.assertIs(body['store'], False)
+            self.assertTrue(server.ai_configured())
+
+    def test_local_base_url_needs_no_key(self):
+        env = {'OPENAI_BASE_URL': 'http://localhost:11434/v1/', 'OPENAI_MODEL': 'qwen2.5:7b'}
+        with patch.dict(server.os.environ, env, clear=True):
+            request = server.model_request('', [], {}, 'x')
+            body = server.json.loads(request.data)
+            self.assertEqual(request.full_url, 'http://localhost:11434/v1/chat/completions')
+            self.assertIsNone(request.get_header('Authorization'))
+            self.assertNotIn('store', body)
+            self.assertEqual(body['model'], 'qwen2.5:7b')
+            self.assertTrue(server.ai_configured())
+
+    def test_nothing_configured_means_manual_mode(self):
+        with patch.dict(server.os.environ, {}, clear=True):
+            self.assertFalse(server.ai_configured())

@@ -2,6 +2,10 @@
 
 A symptom communication tool for people who find it easier to describe how they feel in a language other than English. Built on the `UI/UX` branch's 3D body painter.
 
+## Evaluation
+
+Say Well is evaluated for **faithfulness**: the English must keep every location, timing, "no" and "not sure" the student gave, and add nothing. On 14 synthetic scenarios in 7 languages (Chinese, Spanish, Arabic, Japanese, French, Hindi, English), the first run dropped explicit negatives and leaked source-language text. After fixes, **14/14 passed**, including corrections, prompt injection, vague input with no invented location, and posterior knee. 61/61 deterministic unit tests pass. Methods, metrics, limitations and how to reproduce: [docs/EVALUATION.md](docs/EVALUATION.md).
+
 ## Run locally
 
 ```sh

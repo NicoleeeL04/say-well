@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#121a24">
+  <meta name="color-scheme" content="dark">
+  <title>My medical card · Say Well</title>
+  <link rel="stylesheet" href="flow.css?v=night-2">
+</head>
+<body class="sub-page">
+<a class="skip-link" href="#page-title">Skip to main content</a>
+<div class="app">
+  <aside class="sidebar" aria-label="Say Well">
+    <a class="brand" href="./">Say Well</a>
+    <a class="new-button" href="./">+ New description</a>
+    <nav class="recent" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent</h2>
+      <ol id="recent"></ol>
+    </nav>
+    <a class="side-link" href="history.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg>Pain log
+    </a>
+    <a class="side-link" href="doctor.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg>Doctor’s reply
+    </a>
+    <a class="side-link" href="card.html" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg>My medical card
+    </a>
+    <p class="side-note">Saved only on this device</p>
+  </aside>
+  <header class="topbar">
+    <a class="brand" href="./">Say Well</a>
+    <nav class="top-links" aria-label="Pages"><a class="icon-link" href="./" aria-label="New description"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a><a class="icon-link" href="history.html" aria-label="Pain log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg></a><a class="icon-link" href="doctor.html" aria-label="Doctor’s reply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg></a><a class="icon-link" href="card.html" aria-label="My medical card" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg></a></nav>
+  </header>
+
+  <main id="main">
+    <div class="page-head"><h1 id="page-title" tabindex="-1">My medical card</h1></div>
+    <p class="page-sub">Added to every note for your doctor. Write in English if you can. Saved only on this device.</p>
+    <div class="two-col">
+      <form id="card-form" class="panel card-form">
+        <label class="field-label" for="allergies">Allergies<textarea id="allergies" name="allergies" rows="2" maxlength="1000" placeholder="For example: Penicillin (rash)"></textarea></label>
+        <label class="field-label" for="medications">Medicines I take<textarea id="medications" name="medications" rows="2" maxlength="1000" placeholder="Name, dose, how often"></textarea></label>
+        <label class="field-label" for="conditions">Conditions<textarea id="conditions" name="conditions" rows="2" maxlength="1000" placeholder="For example: Asthma, pregnant, past surgery"></textarea></label>
+        <label class="field-label" for="insurance">Insurance <span class="muted">(only shown to you, never added to notes)</span><textarea id="insurance" name="insurance" rows="2" maxlength="1000" placeholder="Plan name, member ID"></textarea></label>
+        <label class="check"><input type="checkbox" id="include" name="include" checked> Add to my doctor notes</label>
+        <div class="row"><button class="primary" type="submit">Save</button><button class="text-button danger" type="button" id="clear">Clear card</button></div>
+      </form>
+      <section aria-labelledby="preview-title">
+        <h2 id="preview-title" class="preview-title">How it appears on your note</h2>
+        <article class="note"><dl id="preview" class="facts"></dl><p id="preview-empty" class="muted">Nothing will be added yet.</p></article>
+      </section>
+    </div>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <footer class="disclaimer">Saved only in this browser. Clearing browser data removes it.</footer>
+  </main>
+</div>
+<script type="module" src="card.js?v=1"></script>
+</body>
+</html>

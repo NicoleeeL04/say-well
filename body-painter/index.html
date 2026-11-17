@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#121a24">
   <meta name="color-scheme" content="dark">
   <title>Say Well</title>
-  <link rel="stylesheet" href="flow.css?v=night-1">
+  <link rel="stylesheet" href="flow.css?v=night-2">
 </head>
 <body data-step="1">
 <a class="skip-link" href="#page-title">Skip to main content</a>
@@ -21,12 +21,18 @@
     <a id="open-history" class="side-link" href="history.html" data-leave>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg>Pain log <span id="history-count" class="count" hidden></span>
     </a>
+    <a class="side-link" href="doctor.html" data-leave>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg>Doctor’s reply
+    </a>
+    <a class="side-link" href="card.html" data-leave>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg>My medical card
+    </a>
     <p class="side-note">Saved only on this device</p>
   </aside>
 
   <header class="topbar">
     <a class="brand" href="./">Say Well</a>
-    <a class="icon-link" href="history.html" data-leave aria-label="Pain log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg></a>
+    <nav class="top-links" aria-label="Pages"><a class="icon-link" href="history.html" data-leave aria-label="Pain log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg></a><a class="icon-link" href="doctor.html" data-leave aria-label="Doctor’s reply"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg></a><a class="icon-link" href="card.html" data-leave aria-label="My medical card"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg></a></nav>
   </header>
 
   <main id="main">
@@ -35,6 +41,15 @@
       <div class="steps" role="img" aria-label="Step 1 of 2" id="steps"><span class="on"></span><span></span></div>
     </div>
     <p class="page-sub" id="page-sub">Describe it in any language. I’ll ask one thing at a time.</p>
+    <div id="urgent" class="urgent" role="alert" hidden>
+      <span class="urgent-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 8v5M12 17h.01"/><path d="M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+      <div class="urgent-body">
+        <strong id="urgent-title"></strong>
+        <p id="urgent-text"></p>
+        <p class="urgent-small">Say Well can’t judge how serious this is. This is not a diagnosis.</p>
+        <div class="urgent-actions"><a id="urgent-call" class="urgent-call" href="tel:911">Call 911</a><button id="urgent-dismiss" type="button">I’m safe, continue</button></div>
+      </div>
+    </div>
 
     <div class="workspace">
       <section class="chat" id="conversation" aria-label="Conversation">
@@ -93,11 +108,13 @@
           <p id="review-note" class="note-help" hidden>Write your description in English. Manual mode does not translate.</p>
           <div id="fields" class="fields" hidden></div>
           <dl id="facts" class="facts"></dl>
+          <p class="card-link" id="card-link"></p>
         </article>
         <details class="original-notes"><summary>My original words</summary><div id="original" dir="auto"></div></details>
         <button id="share" class="primary big"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Send to my phone</button>
         <p class="share-hint">AirDrop or share two images: the body map and this note.</p>
         <div class="actions"><button id="copy" class="secondary">Copy</button><button id="download" class="secondary">Download</button><button id="save-history" class="secondary">Save to log</button></div>
+        <a id="after-visit" class="after-visit" href="doctor.html" data-leave>After the visit: what did the doctor say? <span aria-hidden="true">→</span></a>
         <div id="review-notice-slot"></div>
       </section>
     </div>
@@ -105,6 +122,6 @@
     <footer class="disclaimer">A communication aid, not a diagnosis.</footer>
   </main>
 </div>
-<script type="module" src="flow.js?v=night-1"></script>
+<script type="module" src="flow.js?v=night-2"></script>
 </body>
 </html>

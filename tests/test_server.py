@@ -61,6 +61,31 @@ class TranslationIsolation(unittest.TestCase):
         self.assertEqual(calls[0][1:],messages[-1:])
         self.assertEqual(result['translation'],'Sorry, I meant left, not right.')
 
+
+class DoctorReplyTests(unittest.TestCase):
+    def reply(self, **over):
+        base={'translation':'每天两次布洛芬。','medications':[{'name':'Ibuprofen','instructions':'400 毫克，每天两次'}],
+              'follow_up':'两周后','return_if':'膝盖肿了','other':'','labels':{'title':'医生说了什么','medications':'用药','follow_up':'复诊','return_if':'尽早回来','other':'其他'}}
+        base.update(over); return base
+
+    def test_doctor_reply_targets_requested_language_and_keeps_text_as_data(self):
+        seen={}
+        def fake(key,messages,schema,name):
+            seen.update(name=name,messages=messages); return self.reply()
+        with patch.object(server,'model_json',side_effect=fake):
+            result=server.doctor_reply('k','Take ibuprofen 400 mg twice a day.','Chinese')
+        self.assertEqual(seen['name'],'doctor_reply')
+        self.assertIn('Chinese',seen['messages'][0]['content'])
+        self.assertEqual(seen['messages'][1],{'role':'user','content':'Take ibuprofen 400 mg twice a day.'})
+        self.assertEqual(result['medications'][0]['name'],'Ibuprofen')
+
+    def test_doctor_reply_rejects_empty_or_malformed_output(self):
+        for bad in [self.reply(translation=''), self.reply(medications='x'), self.reply(labels={'title':'x'}), self.reply(medications=[{'name':1,'instructions':''}])]:
+            with self.assertRaises(ValueError): server.validate_doctor(bad)
+
+    def test_blank_medication_names_are_dropped(self):
+        self.assertEqual(server.validate_doctor(self.reply(medications=[{'name':' ','instructions':'x'}]))['medications'],[])
+
 if __name__=='__main__':unittest.main()
 
 

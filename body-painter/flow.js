@@ -3,6 +3,8 @@ import {activeModel,dental,setDentalReadOnly,notifyModelVisibility,selectModel} 
 import {FIELDS,escapeHTML} from './symptoms.js';
 import {regionLabel,regionText} from './regions.js';
 import {loadHistory,createRecord,saveRecord,thumbnail,recordAreas} from './history.js';
+import {redFlag} from './redflags.js';
+import {loadProfile,profileRows,PROFILE_KEY} from './profile.js';
 
 const $ = id => document.getElementById(id);
 let messages = [], regions = [], painted = null, ai = false, busy = false, step = 1, valid = false;
@@ -149,10 +151,16 @@ function renderFacts() {
     ['Worse or better with', details.triggers],
     ['Also noticed', details.associated],
   ].filter(([, value]) => value && value.trim());
+  const card = profileRows(loadProfile());
+  const fromCard = new Set(card.map(([key]) => key));
+  rows.push(...card);
+  const profile = loadProfile();
+  $('card-link').replaceChildren(card.length ? 'From my medical card · ' : (profile.include ? 'Add allergies and medicines once: ' : 'Medical card is off · '),
+    Object.assign(document.createElement('a'), {href:'card.html', textContent:card.length || !profile.include ? 'Edit' : 'My medical card', target:'_blank'}));
   $('facts').replaceChildren(...rows.map(([key, value]) => {
     const row = document.createElement('div');
-    row.className = 'fact';
-    if (step === 2 && lastFacts[key] !== undefined && lastFacts[key] !== value) {
+    row.className = fromCard.has(key) ? 'fact from-card' : 'fact';
+    if (step === 2 && !fromCard.has(key) && lastFacts[key] !== undefined && lastFacts[key] !== value) {
       row.classList.add('just-updated');
       setTimeout(() => row.classList.remove('just-updated'), 1800);
     }
@@ -260,6 +268,25 @@ function showTranslation(text) {
   disclosure.append(Object.assign(document.createElement('summary'), {textContent:'English'}), Object.assign(document.createElement('p'), {dir:'ltr', textContent:text}));
   lastUserBubble?.append(disclosure);
 }
+// ---------- emergency warning signs (works without AI) ----------
+let dismissedFlag = '';
+function checkRedFlags(...extra) {
+  const flag = redFlag(...translations.flatMap(t => [t.original, t.english]), $('review-english').value, ...extra);
+  if (!flag || flag.id === dismissedFlag) return;
+  $('urgent-title').textContent = flag.title;
+  $('urgent-text').textContent = flag.message;
+  $('urgent-call').href = `tel:${flag.call}`;
+  $('urgent-call').textContent = flag.call === '988' ? 'Call or text 988' : 'Call 911';
+  const wasHidden = $('urgent').hidden;
+  $('urgent').hidden = false;
+  if (wasHidden) $('urgent').scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+$('urgent-dismiss').onclick = () => {
+  dismissedFlag = redFlag(...translations.flatMap(t => [t.original, t.english]), $('review-english').value)?.id || '';
+  $('urgent').hidden = true;
+};
+$('review-english').addEventListener('change', () => checkRedFlags());
+
 function setBusy(value) {
   busy = value;
   for (const id of ['send', 'retry', 'use-manual', 'description', 'consent']) $(id).disabled = value;
@@ -281,6 +308,7 @@ async function interpret() {
     if (!response.ok) throw Error(data.error || 'Translation is unavailable right now.');
     translations.at(-1).english = data.translation;
     showTranslation(data.translation);
+    if (/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(data.language || '') && !/^en/.test(data.language)) { try { localStorage.setItem('saywell.language.v1', data.language); } catch {} }
     $('review-english').value = data.statement;
     for (const key of Object.keys(FIELDS)) { details[key] = data.details[key] || ''; $(`field-${key}`).value = details[key]; }
     regions = data.regions;
@@ -290,6 +318,7 @@ async function interpret() {
     messages.push({role:'assistant', content:data.reply});
     valid = Boolean(data.statement.trim());
     interpretationFailed = false;
+    checkRedFlags(data.statement);
     renderUnderstood();
   } catch (error) {
     interpretationFailed = true;
@@ -319,6 +348,7 @@ $('chat-form').onsubmit = async event => {
   messages.push({role:'user', content:text});
   translations.push({original:text, english:''});
   lastUserBubble = bubble('user', text);
+  checkRedFlags();
   $('description').value = '';
   $('description').style.height = 'auto';
   $('send').disabled = true;
@@ -446,11 +476,13 @@ $('save-history').onclick = async () => {
   const record = createRecord({
     id:historyId, statement:$('review-english').value, locations:locationLabels(), areas:bodyAreas(),
     originals:translations, model:isDental ? 'dental' : 'body', image, score,
+    doctor:loadHistory().find(r => r.id === historyId)?.doctor,
   });
   try {
     const updating = Boolean(historyId);
     saveRecord(record);
     historyId = record.id; saved = true;
+    $('after-visit').href = `doctor.html#${encodeURIComponent(historyId)}`;
     renderRecent();
     notice(updating ? 'Pain log entry updated.' : 'Saved to your pain log on this device.');
   } catch {
@@ -458,7 +490,11 @@ $('save-history').onclick = async () => {
   }
 };
 renderRecent();
-addEventListener('storage', event => { if (event.key?.startsWith('saywell.history')) renderRecent(); });
+addEventListener('storage', event => {
+  if (event.key?.startsWith('saywell.history')) renderRecent();
+  if (event.key === PROFILE_KEY) renderFacts();
+});
+addEventListener('focus', () => { if (step === 2) renderFacts(); });
 
 // ---------- mode ----------
 function configureMode() {

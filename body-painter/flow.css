@@ -158,6 +158,65 @@ iframe{display:block;width:100%;border:0;background:transparent;color-scheme:dar
 .notice{font-size:14px;line-height:1.55;padding:12px 16px;border-radius:14px;background:rgba(243,193,122,.12);color:var(--warn);margin:4px 0;overflow-wrap:anywhere}
 .notice[data-tone=success]{background:var(--accent-soft);color:var(--accent)}
 
+/* ---------- emergency banner ---------- */
+.urgent{margin-top:18px;display:flex;gap:14px;align-items:flex-start;padding:18px;border-radius:20px;background:#3A1F22;border:1px solid rgba(241,132,120,.55);animation:urgent-in 240ms var(--ease-out)}
+@keyframes urgent-in{from{opacity:0;transform:translateY(-6px)}}
+.urgent-icon{width:36px;height:36px;flex:none;border-radius:18px;background:#F18478;color:var(--accent-ink);display:grid;place-items:center}
+.urgent-icon svg{stroke-width:2.2}
+.urgent-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.urgent strong{font-size:17px}
+.urgent p{font-size:15px;line-height:1.5;color:#F6D6D2}
+.urgent .urgent-small{font-size:13px;color:#D8AFAA}
+.urgent-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.urgent-call{min-height:46px;padding:0 20px;border-radius:23px;background:#F18478;color:var(--accent-ink);font-size:15px;font-weight:700;display:inline-flex;align-items:center;text-decoration:none}
+.urgent-actions button{min-height:46px;padding:0 16px;border-radius:23px;border:0;background:rgba(255,255,255,.1);font-size:15px}
+
+/* ---------- medical card rows on the note ---------- */
+.fact.from-card{background:#ECE8FA;border-top-color:transparent;margin-top:4px}
+.card-link{font-size:13px;color:var(--paper-muted);padding:10px 0 6px}
+.card-link a{color:#4B5E9E}
+.after-visit{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;font-size:15px;color:var(--violet);text-decoration:none}
+.after-visit:hover{text-decoration:underline}
+
+/* ---------- doctor's reply & medical card pages ---------- */
+.side-link + .side-link{margin-top:0}
+.top-links{display:flex;gap:2px}
+.icon-link[aria-current=page]{background:var(--panel-2)}
+.two-col{margin-top:24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.field-label{display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--muted)}
+.field-label.inline{display:inline;margin-left:auto}
+.doctor-input,.card-form{display:flex;flex-direction:column;gap:16px}
+.doctor-input textarea,.card-form textarea{width:100%;border:1px solid transparent;border-radius:16px;background:#172231;color:var(--text);padding:14px 16px;font-size:16px;line-height:1.6;resize:vertical}
+.doctor-input textarea{min-height:200px}
+.doctor-input textarea:focus,.card-form textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+select{min-height:44px;border-radius:22px;border:0;background:var(--chip);padding:0 14px;font-size:15px}
+.hint{font-size:13px;color:var(--faint);line-height:1.5}
+.muted{color:var(--faint)}
+.rec-dot{width:10px;height:10px;border-radius:5px;background:#F18478}
+#listen.recording{background:#3A1F22;color:#F6D6D2}
+#listen.recording .rec-dot{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+.doctor-result{display:flex;flex-direction:column;gap:12px}
+.empty-result{padding:28px 24px;border:1px dashed rgba(255,255,255,.14);border-radius:24px;color:var(--muted);font-size:15px}
+.doctor-points{display:flex;flex-direction:column;gap:10px}
+.doctor-translation{padding:18px 20px;border-radius:20px;background:var(--panel);font-size:17px;line-height:1.65}
+.point{padding:14px 18px;border-radius:18px;background:var(--panel-2);display:flex;flex-direction:column;gap:4px}
+.point h3{font-size:13px;font-weight:600;color:var(--accent)}
+.point.warn h3{color:#F18478}
+.point.other h3{color:var(--violet)}
+.point p,.point li{font-size:16px;line-height:1.55}
+.meds{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.save-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+.save-row select{flex:1;min-width:0}
+.check{display:flex;gap:10px;align-items:center;font-size:15px}
+.check input{width:20px;height:20px;accent-color:var(--accent)}
+.preview-title{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.card-form .row{margin-top:4px}
+.danger{color:#F18478}
+.entry-doctor{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.entry-doctor h4{margin:0;font-size:14px;color:var(--violet)}
+
 /* ---------- responsive ---------- */
 @media(max-width:1180px){
   .workspace{grid-template-columns:minmax(0,1fr) 300px}
@@ -169,7 +228,7 @@ iframe{display:block;width:100%;border:0;background:transparent;color-scheme:dar
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 12px 4px 10px}
   .icon-link{width:44px;height:44px;display:grid;place-items:center;color:var(--text);border-radius:22px}
   main{padding:12px 18px calc(20px + env(safe-area-inset-bottom))}
-  .workspace,body[data-step="2"] .workspace{grid-template-columns:minmax(0,1fr)}
+  .workspace,body[data-step="2"] .workspace,.two-col{grid-template-columns:minmax(0,1fr)}
   .understood{display:none}
   .chat{min-height:calc(100dvh - 220px)}
   h1{font-size:26px}
@@ -178,6 +237,8 @@ iframe{display:block;width:100%;border:0;background:transparent;color-scheme:dar
   #dental-model{height:520px}
 }
 @media(max-width:480px){
+  .urgent{padding:16px;gap:12px}
+  .doctor-translation{font-size:16px}
   main{padding-inline:14px}
   .model-card{padding:14px 12px 18px;border-radius:20px}
   .note{padding:22px 20px 10px;border-radius:22px}

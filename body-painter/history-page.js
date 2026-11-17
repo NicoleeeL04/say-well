@@ -1,5 +1,6 @@
 import {loadHistory, deleteRecord, clearHistory, formatWhen, sampleHistory, recordAreas, areaCounts, patternInsights, titleCase} from './history.js';
 import {escapeHTML} from './symptoms.js';
+import {doctorPoints} from './doctor-view.js';
 
 const $ = id => document.getElementById(id);
 const demo = new URLSearchParams(location.search).has('demo');
@@ -124,7 +125,14 @@ function entryItem(r) {
   const text = document.createElement('div');
   text.append(Object.assign(document.createElement('p'), {className:'when-full', textContent:formatWhen(r.savedAt)}));
   if (r.originals.length) text.append(Object.assign(document.createElement('p'), {dir:'auto', className:'orig', textContent:r.originals.map(o => o.original).join('\n')}));
+  if (r.doctor) {
+    const box = Object.assign(document.createElement('section'), {className:'entry-doctor'});
+    box.append(Object.assign(document.createElement('h4'), {textContent:'Doctor’s reply'}), Object.assign(document.createElement('p'), {className:'orig', textContent:r.doctor.text}));
+    if (r.doctor.translation) box.append(doctorPoints(r.doctor));
+    text.append(box);
+  }
   if (!demo) {
+    text.append(Object.assign(document.createElement('a'), {className:'text-button', href:`doctor.html#${encodeURIComponent(r.id)}`, textContent:r.doctor ? 'Update the doctor’s reply' : 'Add what the doctor said'}));
     const del = Object.assign(document.createElement('button'), {type:'button', className:'text-button danger', textContent:'Delete this entry'});
     del.onclick = () => { if (confirm(`Delete the entry from ${formatWhen(r.savedAt)}? This can’t be undone.`)) { all = deleteRecord(r.id); render(); renderRecent(); } };
     text.append(del);
@@ -181,7 +189,7 @@ addEventListener('hashchange', openFromHash);
 $('clear').onclick = () => { if (confirm('Delete your whole pain log from this browser? This can’t be undone.')) { all = clearHistory(); render(); renderRecent(); } };
 $('export').onclick = () => {
   const insights = patternInsights(all).map(i => `<li>${escapeHTML(i.text)}</li>`).join('');
-  const entries = all.map(r => `<section><h3>${escapeHTML(formatWhen(r.savedAt))}${r.score ? ` · pain ${r.score}/10` : ''}</h3><p><b>Where:</b> ${escapeHTML(r.locations.join(', ') || recordAreas(r).join(', ') || 'Not specified')}</p><p>${escapeHTML(r.statement)}</p>${r.image ? `<img alt="Saved markings" src="${r.image}">` : ''}${r.originals.length ? `<p dir="auto"><small>${escapeHTML(r.originals.map(o => o.original).join('\n'))}</small></p>` : ''}</section>`).join('');
+  const entries = all.map(r => `<section><h3>${escapeHTML(formatWhen(r.savedAt))}${r.score ? ` · pain ${r.score}/10` : ''}</h3><p><b>Where:</b> ${escapeHTML(r.locations.join(', ') || recordAreas(r).join(', ') || 'Not specified')}</p><p>${escapeHTML(r.statement)}</p>${r.image ? `<img alt="Saved markings" src="${r.image}">` : ''}${r.originals.length ? `<p dir="auto"><small>${escapeHTML(r.originals.map(o => o.original).join('\n'))}</small></p>` : ''}${r.doctor ? `<p><b>Doctor said:</b> ${escapeHTML(r.doctor.text)}</p>${r.doctor.translation ? `<p dir="auto">${escapeHTML(r.doctor.translation)}</p>` : ''}` : ''}</section>`).join('');
   const html = `<!doctype html><html lang="en"><meta charset="utf-8"><title>My pain log</title><style>body{font:16px/1.65 system-ui;max-width:860px;margin:40px auto;padding:24px;color:#12181F}section{border-top:1px solid #e3e7e5;padding:14px 0}p{white-space:pre-wrap}img{width:180px;border-radius:12px;background:#E7ECEA}small{color:#5B6672}</style><h1>My pain log</h1><small>Patient-kept log · Not a diagnosis · ${plural(all.length, 'entry')}</small>${insights ? `<h2>Patterns</h2><ul>${insights}</ul>` : ''}<h2>Entries</h2>${entries}</html>`;
   const url = URL.createObjectURL(new Blob([html], {type:'text/html'}));
   Object.assign(document.createElement('a'), {href:url, download:'my-pain-log.html'}).click();

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#121a24">
+  <meta name="color-scheme" content="dark">
+  <title>Doctor’s reply · Say Well</title>
+  <link rel="stylesheet" href="flow.css?v=night-2">
+</head>
+<body class="sub-page">
+<a class="skip-link" href="#page-title">Skip to main content</a>
+<div class="app">
+  <aside class="sidebar" aria-label="Say Well">
+    <a class="brand" href="./">Say Well</a>
+    <a class="new-button" href="./">+ New description</a>
+    <nav class="recent" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent</h2>
+      <ol id="recent"></ol>
+    </nav>
+    <a class="side-link" href="history.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg>Pain log
+    </a>
+    <a class="side-link" href="doctor.html" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg>Doctor’s reply
+    </a>
+    <a class="side-link" href="card.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg>My medical card
+    </a>
+    <p class="side-note">Saved only on this device</p>
+  </aside>
+  <header class="topbar">
+    <a class="brand" href="./">Say Well</a>
+    <nav class="top-links" aria-label="Pages"><a class="icon-link" href="./" aria-label="New description"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a><a class="icon-link" href="history.html" aria-label="Pain log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg></a><a class="icon-link" href="doctor.html" aria-label="Doctor’s reply" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4zM8 9h8M8 12h5"/></svg></a><a class="icon-link" href="card.html" aria-label="My medical card"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 9v6M9 12h6"/></svg></a></nav>
+  </header>
+
+  <main id="main">
+    <div class="page-head"><h1 id="page-title" tabindex="-1">What did the doctor say?</h1></div>
+    <p class="page-sub">Record or type the doctor’s words. Say Well translates them and pulls out what to do.</p>
+    <div class="two-col">
+      <section class="panel doctor-input" aria-labelledby="input-title">
+        <h2 id="input-title" class="sr-only">The doctor’s words</h2>
+        <label for="doctor-text" class="field-label">The doctor’s words (English)</label>
+        <textarea id="doctor-text" rows="8" maxlength="8000" placeholder="For example: Take ibuprofen 400 mg twice a day with food for 5 days. Come back in two weeks." dir="auto"></textarea>
+        <p id="listen-status" class="hint" role="status" hidden></p>
+        <div class="row">
+          <button id="listen" type="button" class="secondary" hidden aria-pressed="false"><span class="rec-dot" aria-hidden="true"></span><span id="listen-label">Record</span></button>
+          <label class="field-label inline" for="language">Translate to</label>
+          <select id="language"></select>
+        </div>
+        <label id="consent-row" class="consent" hidden><input type="checkbox" id="consent"><span>Use AI to translate. The doctor’s words are sent to the AI service.</span></label>
+        <button id="translate" type="button" class="primary big" disabled>Translate</button>
+        <p id="manual-note" class="hint" hidden>Translation is off on this server. You can still save the doctor’s words to your pain log.</p>
+        <p class="hint">Ask the doctor first before recording. Voice typing uses your browser’s speech service.</p>
+      </section>
+      <section class="doctor-result" aria-labelledby="result-title" aria-live="polite">
+        <h2 id="result-title" class="sr-only">Translation and key points</h2>
+        <p id="thinking" role="status" hidden><span class="thinking-dot" aria-hidden="true"></span>Translating…</p>
+        <div id="result" class="empty-result"><p>Your translation and the key points (medicines, follow-up, when to come back) will show here.</p></div>
+        <div class="save-row" id="save-row" hidden>
+          <label class="field-label inline" for="attach">Save with</label>
+          <select id="attach"></select>
+          <button id="save" type="button" class="secondary">Save to log</button>
+        </div>
+        <p class="hint">Always check doses with the pharmacist or the label.</p>
+      </section>
+    </div>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <footer class="disclaimer">A communication aid, not medical advice.</footer>
+  </main>
+</div>
+<script type="module" src="doctor.js?v=1"></script>
+</body>
+</html>

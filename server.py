@@ -20,7 +20,7 @@ def load_local_env():
         if separator and name in {'OPENAI_API_KEY', 'OPENAI_MODEL', 'OPENAI_BASE_URL', 'PORT'}:
             os.environ.setdefault(name, value.strip().strip('\"\''))
 
-from interpretation import FIELDS, REGIONS, PROMPT, SCHEMA, TRANSLATION_PROMPT, TRANSLATION_SCHEMA, validate_result
+from interpretation import FIELDS, REGIONS, PROMPT, SCHEMA, TRANSLATION_PROMPT, TRANSLATION_SCHEMA, DOCTOR_PROMPT, DOCTOR_SCHEMA, validate_result, validate_doctor
 
 
 OPENAI_URL = 'https://api.openai.com/v1'
@@ -75,7 +75,15 @@ def interpret(key, messages):
         # English needs no translation: preserve it verbatim instead of allowing
         # a translation model to paraphrase or accidentally switch languages.
         result['translation'] = latest if translated['source_language'].lower() in {'en', 'eng', 'english'} else translated['translation']
-    return validate_result(result)
+    clean = validate_result(result)
+    language = translated.get('source_language') if isinstance(translated.get('source_language'), str) else ''
+    clean['language'] = language.strip()[:20]
+    return clean
+
+
+def doctor_reply(key, text, language):
+    prompt = DOCTOR_PROMPT.replace('{language}', language)
+    return validate_doctor(model_json(key, [{'role':'system','content':prompt}, {'role':'user','content':text}], DOCTOR_SCHEMA, 'doctor_reply'))
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self,*args,**kwargs):
@@ -97,7 +105,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(404,{'error':'Not found'})
         return super().do_GET()
     def do_POST(self):
-        if self.path!='/api/interpret':
+        if self.path not in ('/api/interpret','/api/doctor'):
             return self.send_json(404,{'error':'Not found'})
         # Browser calls must be same origin. Bind locally, with no CORS allowance.
         # Behind an HTTPS proxy (Replit, Render) the page origin is https:// and the
@@ -113,6 +121,11 @@ class Handler(SimpleHTTPRequestHandler):
             length=int(self.headers.get('Content-Length','0'))
             if not 0<length<=64000: raise ValueError('Invalid request size')
             data=json.loads(self.rfile.read(length))
+            if self.path=='/api/doctor':
+                text,language=data.get('text'),data.get('language')
+                if not isinstance(text,str) or not 0<len(text.strip())<=8000: raise ValueError('Invalid text')
+                if not isinstance(language,str) or not 0<len(language.strip())<=40 or not all(c.isalnum() or c in ' -()' or ord(c)>127 for c in language): raise ValueError('Invalid language')
+                return self.send_json(200,doctor_reply(key,text.strip(),language.strip()))
             messages=data.get('messages')
             if not isinstance(messages,list) or not 1<=len(messages)<=30: raise ValueError('Invalid conversation')
             for message in messages:

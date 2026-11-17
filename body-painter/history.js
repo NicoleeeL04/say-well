@@ -24,7 +24,7 @@ function write(storage, records) {
   storage.setItem(HISTORY_KEY, JSON.stringify(records));
 }
 
-export function createRecord({id, statement, locations, areas, originals, model, image, score, now = new Date()}) {
+export function createRecord({id, statement, locations, areas, originals, model, image, score, doctor, now = new Date()}) {
   const pain = Math.round(Number(score));
   return {
     id: id || `${now.getTime().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
@@ -36,7 +36,30 @@ export function createRecord({id, statement, locations, areas, originals, model,
     model: model === 'dental' ? 'dental' : 'body',
     image: typeof image === 'string' && image.startsWith('data:image/') ? image : '',
     score: pain >= 1 && pain <= 10 ? pain : null,
+    doctor: cleanDoctor(doctor),
   };
+}
+
+const text = (v, max = 12000) => String(v ?? '').trim().slice(0, max);
+// What the clinician said at the visit, with its translation and key points.
+export function cleanDoctor(d) {
+  if (!d || typeof d !== 'object' || !text(d.text)) return null;
+  const labels = d.labels && typeof d.labels === 'object' ? Object.fromEntries(['title', 'medications', 'follow_up', 'return_if', 'other'].map(k => [k, text(d.labels[k], 80)])) : null;
+  return {
+    text: text(d.text), language: text(d.language, 40), translation: text(d.translation),
+    medications: Array.isArray(d.medications) ? d.medications.slice(0, 20).map(m => ({name: text(m?.name, 2000), instructions: text(m?.instructions, 2000)})).filter(m => m.name) : [],
+    follow_up: text(d.follow_up), return_if: text(d.return_if), other: text(d.other), labels,
+    savedAt: typeof d.savedAt === 'string' ? d.savedAt : new Date().toISOString(),
+  };
+}
+
+export function attachDoctor(id, doctor, storage = browserStorage()) {
+  const records = loadHistory(storage);
+  const record = records.find(r => r.id === id);
+  if (!record) throw Error('That pain log entry no longer exists.');
+  record.doctor = cleanDoctor(doctor);
+  write(storage, records);
+  return record;
 }
 
 // Saving the same id again replaces that entry (one entry per session).

@@ -47,6 +47,12 @@ The layout is responsive: phones get one column and a compact top bar; desktops 
 
 No diagnosis or treatment is generated. Unknown details remain unspecified. The mapping is approximate, not anatomical measurement. Clinician review and a qualified interpreter may still be needed. This is a local prototype, not a deployment-ready clinical system.
 
+## Safety and visit tools
+
+- **Emergency warning signs** (`body-painter/redflags.js`): checks the patient's own words and the English translation for warning signs in English, Chinese and Spanish (chest pain with breathing trouble, stroke signs, worst-ever headache, severe allergic reaction, heavy bleeding, fainting, fever with stiff neck, thoughts of self-harm). A match shows a banner with Call 911 (or Call or text 988). It works without AI, never diagnoses, and can be dismissed.
+- **Doctor's reply** (`doctor.html`, `POST /api/doctor`): the patient records (browser speech recognition, en-US) or types what the clinician said; the AI translates it into the patient's language and pulls out medicines, follow-up, when to come back sooner and other advice. It can be saved with a pain log entry. Without AI, the words can still be saved.
+- **My medical card** (`card.html`, `saywell.profile.v1` in localStorage): allergies, medicines and conditions are added to every doctor note (and the shared image) unless turned off. Insurance is shown only to the patient and never added to notes.
+
 ## Data handling
 
 Conversations and drawings live in page memory and clear on refresh, unless you choose **Save to log** (see below). The server does not save them or log request bodies. In AI mode, text is sent to OpenAI with `store: false`; provider processing and retention policies still apply. Drawings stay local. Downloaded notes contain symptom information and are saved only when requested. No analytics or external font dependencies are included.

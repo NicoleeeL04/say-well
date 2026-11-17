@@ -2,11 +2,20 @@
 (or OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:7b for a local model)."""
 import json
 import os
+import sys
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import Request, urlopen
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 from concurrent.futures import ThreadPoolExecutor
+import ssl
+
+try:
+    # python.org builds on macOS ship without system certificates; certifi fixes that.
+    import certifi
+    SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    SSL_CONTEXT = None
 
 ROOT = Path(__file__).resolve().parent
 
@@ -51,13 +60,62 @@ def model_request(key, messages, schema, name):
     return Request(base+'/chat/completions', data=json.dumps(payload).encode(), headers=headers)
 
 
+def gemini_native():
+    # Gemini's own endpoint (base URL without /openai). New AI Studio keys
+    # ("AQ." auth keys) work here but not on the OpenAI-compatible endpoint.
+    base = ai_base_url()
+    return 'generativelanguage.googleapis.com' in base and not base.endswith('/openai')
+
+
+def gemini_request(key, messages, schema):
+    system = '\n\n'.join(m['content'] for m in messages if m['role'] == 'system')
+    contents = [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]}
+                for m in messages if m['role'] != 'system']
+    payload = {'contents': contents,
+               'generationConfig': {'temperature': 0.2, 'responseMimeType': 'application/json',
+                                    'responseJsonSchema': schema}}
+    if system:
+        payload['systemInstruction'] = {'parts': [{'text': system}]}
+    model = os.environ.get('OPENAI_MODEL', 'gemini-3.8-flash')
+    if model.startswith('gemini-3'):
+        # Gemini 3 thinks deeply by default; translation and short questions only need a little.
+        payload['generationConfig']['thinkingConfig'] = {'thinkingLevel': os.environ.get('GEMINI_THINKING', 'low')}
+    return Request(f'{ai_base_url()}/models/{model}:generateContent', data=json.dumps(payload).encode(),
+                   headers={'Content-Type': 'application/json', 'x-goog-api-key': key or ''})
+
+
 def model_json(key, messages, schema, name):
+    if gemini_native():
+        with urlopen(gemini_request(key, messages, schema), timeout=90, context=SSL_CONTEXT) as response:
+            result = json.load(response)
+        parts = result['candidates'][0]['content']['parts']
+        return json.loads(''.join(part.get('text', '') for part in parts if not part.get('thought')))
     request = model_request(key, messages, schema, name)
     # Local models on a laptop are slower than the hosted API.
     timeout = 55 if ai_base_url() == OPENAI_URL else 180
-    with urlopen(request, timeout=timeout) as response:
+    with urlopen(request, timeout=timeout, context=SSL_CONTEXT) as response:
         result = json.load(response)
     return json.loads(result['choices'][0]['message']['content'])
+
+
+def log_upstream_error(error):
+    # Print why the AI call failed (never the key) so local testing is debuggable.
+    detail = ''
+    if isinstance(error, HTTPError):
+        try: detail = error.read(800).decode('utf-8', 'replace')
+        except Exception: pass
+        detail = f'HTTP {error.code} {detail}'
+    else:
+        detail = f'{type(error).__name__}: {error}'
+    key = os.environ.get('OPENAI_API_KEY')
+    if key: detail = detail.replace(key, '<key>')
+    print('AI request failed:', ' '.join(detail.split())[:900], file=sys.stderr, flush=True)
+    try:
+        from datetime import datetime
+        with open(Path(__file__).with_name('ai-error.log'), 'a', encoding='utf-8') as log:
+            log.write(f"{datetime.now():%Y-%m-%d %H:%M:%S} {ai_base_url()} {os.environ.get('OPENAI_MODEL','')} | {' '.join(detail.split())[:900]}\n")
+    except OSError:
+        pass
 
 
 def interpret(key, messages):
@@ -135,7 +193,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json(200,interpret(key,clean_messages))
         except (ValueError,TypeError,AttributeError):
             return self.send_json(400,{'error':'The request or interpretation was incomplete. Please try again or enter details manually.'})
-        except (URLError,TimeoutError,KeyError,IndexError,StopIteration):
+        except (URLError,TimeoutError,KeyError,IndexError,StopIteration,json.JSONDecodeError) as error:
+            log_upstream_error(error)
             return self.send_json(502,{'error':'The interpretation service is unavailable. Please retry or continue manually.'})
 
 if __name__=='__main__':

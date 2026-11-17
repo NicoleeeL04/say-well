@@ -6,22 +6,22 @@ footer{bottom:12px;overflow-wrap:anywhere}.bottom{bottom:76px}.hint{padding-inli
 
 
 /* Night theme, matching the Say Well page around this frame. */
-body{background:radial-gradient(70% 55% at 50% 42%,#1E2B39,#131B24);color:#FFFFFF}
-h1{color:#FFFFFF;font-weight:600;letter-spacing:0;font-size:16px}
+body{background:radial-gradient(70% 55% at 50% 42%,#22324A,#1C2938);color:#EDF2F7}
+h1{color:#EDF2F7;font-weight:600;letter-spacing:0;font-size:16px}
 header p,.hint,.status,#status,footer,.side,#loading{color:#9AA6B4}
 #count{color:#F29573}
 footer a{color:#9AA6B4}
-button,select{background:#26303C;color:#FFFFFF;border-color:transparent;border-radius:12px;font-size:13px;backdrop-filter:none}
+button,select{background:#2A3A4F;color:#EDF2F7;border-color:transparent;border-radius:12px;font-size:13px;backdrop-filter:none}
 button:disabled,select:disabled{opacity:.45}
-button[aria-pressed=true]{background:#6FCF9F;color:#0D1218;border-color:transparent}
-.selection-modes,.panel{background:#0F161E;border-color:transparent;box-shadow:none;border-radius:14px}
+button[aria-pressed=true]{background:#91C9E8;color:#0D1218;border-color:transparent}
+.selection-modes,.panel{background:#131D29;border-color:transparent;box-shadow:none;border-radius:14px}
 .selection-modes button,.panel button{background:transparent;color:#9AA6B4}
-.selection-modes button[aria-pressed=true],.panel button[aria-pressed=true]{background:#2A3542;color:#FFFFFF}
+.selection-modes button[aria-pressed=true],.panel button[aria-pressed=true]{background:#34465E;color:#EDF2F7}
 .divider{background:rgba(255,255,255,.12)}
 .open{color:#9AA6B4}
-input{accent-color:#6FCF9F}
+input{accent-color:#91C9E8}
 #clear{background:transparent;color:#9AA6B4}
-button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline-color:#6FCF9F}
-@media(hover:hover) and (pointer:fine){button:hover:not(:disabled){background:#2E3946;border-color:transparent;color:#FFFFFF}.panel button:hover{background:#1C2530}}
-@media(prefers-reduced-transparency:reduce){button,select,.panel{background:#26303C}}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline-color:#91C9E8}
+@media(hover:hover) and (pointer:fine){button:hover:not(:disabled){background:#3A4D66;border-color:transparent;color:#EDF2F7}.panel button:hover{background:#24344A}}
+@media(prefers-reduced-transparency:reduce){button,select,.panel{background:#2A3A4F}}
 html{color-scheme:dark}

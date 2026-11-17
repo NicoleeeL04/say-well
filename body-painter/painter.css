@@ -6,10 +6,10 @@
 
 /* Night theme, matching the Say Well page around this frame. */
 body{background:transparent;color:#9AA6B4;padding:0;color-scheme:dark}
-.btn{background:#26303C;color:#FFFFFF;border-color:transparent;border-radius:12px;min-height:40px;padding:0 14px;font-size:14px}
-.mode-buttons{background:#0F161E;border-radius:14px;padding:4px;gap:4px}
+.btn{background:#2A3A4F;color:#EDF2F7;border-color:transparent;border-radius:12px;min-height:40px;padding:0 14px;font-size:14px}
+.mode-buttons{background:#131D29;border-radius:14px;padding:4px;gap:4px}
 .mode-buttons .btn{background:transparent;color:#9AA6B4}
-.mode-buttons [aria-pressed=true]{background:#6FCF9F;color:#0D1218;box-shadow:none;font-weight:600}
+.mode-buttons [aria-pressed=true]{background:#91C9E8;color:#0D1218;box-shadow:none;font-weight:600}
 .quiet{background:transparent;color:#9AA6B4}
 .stage-wrap{background:transparent;margin-top:6px}
 #sp-stage{height:440px}
@@ -20,11 +20,11 @@ body{background:transparent;color:#9AA6B4;padding:0;color-scheme:dark}
 .more-tools{border-color:rgba(255,255,255,.08)}
 .more-tools summary{color:#9AA6B4;font-size:13px}
 .form-label,output,.viz-row{color:#9AA6B4;font-size:13px}
-.form-select{background:#26303C;color:#FFFFFF;border-color:transparent;border-radius:10px}
-.form-range{accent-color:#6FCF9F}
+.form-select{background:#2A3A4F;color:#EDF2F7;border-color:transparent;border-radius:10px}
+.form-range{accent-color:#91C9E8}
 .status{margin-top:8px}
 .credit{color:#7C8896;font-size:11px}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline-color:#6FCF9F}
-@media(hover:hover) and (pointer:fine){.btn:hover:not(:disabled){background:#2E3946;color:#FFFFFF}.mode-buttons .btn:hover:not([aria-pressed=true]){background:#1C2530;color:#FFFFFF}}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline-color:#91C9E8}
+@media(hover:hover) and (pointer:fine){.btn:hover:not(:disabled){background:#3A4D66;color:#EDF2F7}.mode-buttons .btn:hover:not([aria-pressed=true]){background:#24344A;color:#EDF2F7}}
 @media(max-width:480px){#sp-stage{height:380px}.btn{font-size:13px;padding:0 10px}}
 html{color-scheme:dark;background:transparent}

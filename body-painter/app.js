@@ -12,7 +12,7 @@ mesh.material=new T.MeshStandardMaterial({map:texture,roughness:.70,metalness:0,
 scene.add(new T.HemisphereLight(0xffffff,0x6a6470,2));const key=new T.DirectionalLight(0xfff4e9,2.6);key.position.set(-3,5,4);scene.add(key);const rim=new T.DirectionalLight(0xffffff,1.4);rim.position.set(3,2,-3);scene.add(rim);
 const renderer=new T.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0,0);stage.append(renderer.domElement);
 const camera=new T.PerspectiveCamera(34,1,.01,30);let distance=3.5;const orientation=new T.Quaternion();camera.position.set(0,.89,distance);camera.lookAt(0,.89,0);
-const state={left:0,right:0,mode:'paint',size:3,color:0},palette=['#d44d61','#397bd1','#9652b5'];let strokeCount=0,undo=[],drag=null,readOnly=false,revision=0;
+const state={left:0,right:0,mode:'paint',size:3,color:0},palette=['#F18478','#397bd1','#9652b5'];let strokeCount=0,undo=[],drag=null,readOnly=false,revision=0;
 function changed(source){revision++;root.dispatchEvent(new CustomEvent('paintchange',{detail:{source,revision}}));}
 const ring=new T.Mesh(new T.RingGeometry(.92,1,48),new T.MeshBasicMaterial({color:0xa33950,side:T.DoubleSide,depthTest:false,transparent:true,opacity:.8}));ring.renderOrder=20;ring.visible=false;scene.add(ring);
 const bones={};for(const [side,suffix]of [['left','l'],['right','r']]){const bone=mesh.skeleton.bones.find(b=>b.name==='upperarm_'+suffix);bones[side]={bone,rest:bone.quaternion.clone(),sign:side==='left'?1:-1};}

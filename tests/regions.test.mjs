@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {REGIONS,matchesRegion} from '../body-painter/regions.js';
+import {REGIONS,matchesRegion,summarizePainted} from '../body-painter/regions.js';
 // Exercise the actual bundled model, not invented points matching the code.
 const glb=readFileSync(new URL('../body-painter/human.glb',import.meta.url));
 const jsonLength=glb.readUInt32LE(12),gltf=JSON.parse(glb.subarray(20,20+jsonLength).toString());
@@ -41,4 +41,18 @@ test('posterior knee uses back-facing surfaces, distinct from front',()=>{
 test('hand marking cannot spill onto torso or upper arm',()=>{
  const selected=points.filter(p=>matchesRegion(p,{region:'hand',side:'left'}));
  assert.ok(selected.every(p=>/^(hand|index|middle|pinky|ring|thumb)/.test(p.bone)));
+});
+
+const painted=(region,side,surface='front')=>points.filter(p=>matchesRegion(p,{region,side,surface}));
+test('painting a right knee is read back as the right knee, not the leg',()=>{
+ assert.deepEqual(summarizePainted(painted('knee','right')),[{region:'knee',side:'right',surface:'front'}]);
+});
+test('painting knee and thigh reports both; matching sides merge into "both"',()=>{
+ const found=summarizePainted([...painted('knee','right'),...painted('thigh','right')]);
+ assert.deepEqual(found.map(f=>f.region).sort(),['knee','thigh']);
+ assert.deepEqual(summarizePainted(painted('knee','both')),[{region:'knee',side:'both',surface:'front'}]);
+});
+test('lower back paint is reported as lower back; a few stray faces are ignored',()=>{
+ assert.deepEqual(summarizePainted(painted('lower_back','unspecified','back')).map(f=>f.region),['lower_back']);
+ assert.deepEqual(summarizePainted(painted('knee','right').slice(0,3)),[]);
 });

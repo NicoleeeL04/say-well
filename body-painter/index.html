@@ -3,70 +3,108 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
-  <meta name="theme-color" content="#f6f7f9">
+  <meta name="theme-color" content="#121a24">
+  <meta name="color-scheme" content="dark">
   <title>Say Well</title>
-  <link rel="stylesheet" href="flow.css?v=tooth-preview-1">
+  <link rel="stylesheet" href="flow.css?v=night-1">
 </head>
 <body data-step="1">
 <a class="skip-link" href="#page-title">Skip to main content</a>
-<header class="app-header">
-  <a class="brand" href="./" aria-label="Say Well home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M7 7h18v13H15l-8 6V7Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 13h10M11 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>say well<span class="brand-dot">.</span></span></a>
-  <a id="open-history" class="secondary history-button" href="history.html">My history <span id="history-count" class="history-count" hidden></span></a>
-</header>
-<main>
-  <nav class="progress-nav" aria-label="Your progress">
-    <button data-step="1" aria-current="step"><b>1</b><span>Describe</span></button><span class="step-line" aria-hidden="true"></span>
-    <button data-step="2" disabled><b>2</b><span>Review & locate</span></button><span class="step-line" aria-hidden="true"></span>
-    <button data-step="3" disabled><b>3</b><span>Your statement</span></button>
-  </nav>
-  <div class="intro"><h1 id="page-title" tabindex="-1">Describe your symptoms</h1></div>
-  <div class="workspace">
-    <section class="card conversation" id="conversation" aria-labelledby="chat-title">
-      <div class="card-heading"><div><h2 id="chat-title">Your conversation</h2></div><span class="badge" id="connection">Connecting…</span></div>
-      <div id="messages" role="log" aria-live="polite" aria-label="Symptom conversation"><div class="message assistant"><span class="message-author">Say Well</span><div class="message-content">What’s been bothering you?</div></div></div>
-      <p id="thinking" role="status" hidden><span class="thinking-dot" aria-hidden="true"></span> Translating…</p>
-      <div class="composer-area">
-        <label id="consent-row" class="consent permission" hidden><input type="checkbox" id="consent"><span><strong>Use AI to help translate my words</strong><span>My symptom text will be sent to OpenAI. Body drawings stay in this browser.</span></span></label>
-        <form id="chat-form">
+<div class="app">
+  <aside class="sidebar" aria-label="Say Well">
+    <a class="brand" href="./">Say Well</a>
+    <a class="new-button" href="./" data-leave>+ New description</a>
+    <nav class="recent" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent</h2>
+      <ol id="recent"></ol>
+    </nav>
+    <a id="open-history" class="side-link" href="history.html" data-leave>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg>Pain log <span id="history-count" class="count" hidden></span>
+    </a>
+    <p class="side-note">Saved only on this device</p>
+  </aside>
+
+  <header class="topbar">
+    <a class="brand" href="./">Say Well</a>
+    <a class="icon-link" href="history.html" data-leave aria-label="Pain log"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg></a>
+  </header>
+
+  <main id="main">
+    <div class="page-head">
+      <h1 id="page-title" tabindex="-1">What’s bothering you?</h1>
+      <div class="steps" role="img" aria-label="Step 1 of 2" id="steps"><span class="on"></span><span></span></div>
+    </div>
+    <p class="page-sub" id="page-sub">Describe it in any language. I’ll ask one thing at a time.</p>
+
+    <div class="workspace">
+      <section class="chat" id="conversation" aria-label="Conversation">
+        <div id="messages" role="log" aria-live="polite" aria-label="Conversation">
+          <div class="message assistant"><span class="sr-only">Say Well: </span><div class="message-content">Hi, what’s bothering you? Any language is fine.</div></div>
+        </div>
+        <p id="thinking" role="status" hidden><span class="thinking-dot" aria-hidden="true"></span>Thinking…</p>
+        <label id="consent-row" class="consent" hidden><input type="checkbox" id="consent"><span>Use AI to translate. Your words are sent to the AI service; drawings stay on this device.</span></label>
+        <form id="chat-form" class="composer">
           <label for="description" class="sr-only">Describe your symptoms in any language</label>
-          <textarea id="description" maxlength="4000" rows="3" placeholder="Describe your symptoms, in any language" enterkeyhint="send" required></textarea>
-          <div class="composer-bottom"><button class="primary" id="send" type="submit" disabled>Send</button></div>
+          <textarea id="description" maxlength="4000" rows="1" placeholder="Type in any language…" enterkeyhint="send" required></textarea>
+          <button id="send" type="submit" class="round-button" aria-label="Send" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
         </form>
         <div id="chat-notice-slot"></div>
-        <div class="composer-options"><button id="retry" class="secondary" hidden>Retry</button><button id="use-manual" class="text-button" hidden>Continue without AI interpretation</button><p class="privacy-note" id="privacy">Your notes stay in this page until you choose AI interpretation.</p></div>
-      </div>
-      <div class="card-footer"><span id="chat-progress" hidden></span><button id="to-body" class="secondary" disabled>Review description</button></div>
-    </section>
-    <section class="card details" id="details" hidden aria-labelledby="review-title">
-      <div class="section-heading"><div><h2 id="review-title">English description</h2></div></div>
-      <p id="review-note"></p>
-      <label for="review-english" class="sr-only">Your description in English</label><textarea id="review-english" rows="7" maxlength="12000" placeholder="Your English description will appear here."></textarea>
-      <div id="fields"></div>
-      <fieldset id="body-location-fields"><legend>Describe a body location</legend><p class="field-help">Left and right refer to your own body.</p><div class="location-row"><label>Area<select id="region" aria-label="Body region"></select></label><label>Side<select id="side" aria-label="Side"><option value="unspecified">Not sure</option><option value="left">My left</option><option value="right">My right</option><option value="both">Both sides</option></select></label><label>Surface<select id="surface" aria-label="Body surface"><option value="unspecified">Not sure</option><option value="front">Front</option><option value="back">Back</option></select></label><button id="add-region" class="secondary">Add area</button></div><div id="regions" aria-label="Selected body locations"></div></fieldset>
-      <button id="apply-marks" class="secondary small-button">Replace drawing with selected areas</button>
-      <div class="review-return"><button class="text-button" data-back="1">Back to conversation</button></div>
-    </section>
-    <section class="card summary" id="summary" hidden aria-labelledby="summary-title">
-      <h2 id="summary-title">English statement</h2>
-      <label for="statement" class="sr-only">Your symptom statement</label><textarea id="statement" rows="8"></textarea>
-      <div class="location-summary"><h3>Locations</h3><p id="summary-locations"></p></div>
-      <details class="original-notes"><summary>Your original words & translations</summary><div id="original" dir="auto"></div></details>
-      <div class="actions"><button id="copy" class="primary">Copy statement</button><button id="download" class="secondary">Download notes</button><button id="save-history" class="secondary">Save to my history</button></div>
-      <p class="field-help">History is saved in this browser only. Nothing is uploaded.</p>
-      <div id="summary-notice-slot"></div>
-      <button class="text-button" data-back="2">Edit description & locations</button>
-    </section>
-    <aside class="card model-card" id="model-card" hidden aria-labelledby="map-title">
-      <div class="card-heading"><div><h2 id="map-title">Body map</h2></div></div>
-      <div class="model-tabs" role="tablist" aria-label="3D model type"><button id="body-tab" role="tab" aria-selected="true" aria-controls="body-map-panel" tabindex="0" data-model-tab="body">Body</button><button id="dental-tab" role="tab" aria-selected="false" aria-controls="dental-panel" tabindex="-1" data-model-tab="dental">Teeth & gums</button></div>
-      <section id="body-map-panel" role="tabpanel" aria-labelledby="body-tab"><p id="map-status" class="map-status" role="status">Your suggested areas will appear here.</p><iframe id="painter" title="Interactive body symptom map" src="painter.html?v=design-2"></iframe><p class="model-footnote" id="body-map-help">Illustrative model. Review all markings.</p></section>
-      <section id="dental-panel" role="tabpanel" aria-labelledby="dental-tab" hidden><p id="dental-status" class="map-status" role="status">Left and right refer to your own sides.</p><section id="dental-count-question" class="dental-count-question" hidden aria-labelledby="dental-count-title"><h3 id="dental-count-title">Count from</h3><div role="group" aria-label="Count teeth from the back"><button id="count-from-model" class="secondary" aria-pressed="false">Last tooth shown</button><button id="count-from-wisdom" class="secondary" aria-pressed="false">Wisdom tooth</button></div></section><button id="apply-dental" class="secondary small-button" hidden>Replace with suggested dental areas</button><iframe id="dental-model" data-src="dental-model/index.html?v=design-3" title="Interactive dental map: select a tooth or a tooth and its adjacent gum"></iframe><p class="model-footnote" id="dental-map-help">Illustrative model. Wisdom teeth are not shown.</p></section>
-    </aside>
-    <div class="review-actions card" id="review-actions" hidden><label class="consent review-confirm"><input type="checkbox" id="confirmed"><span><strong>I’ve checked the description and locations.</strong></span></label><div id="review-notice-slot"></div><button id="to-summary" class="primary" disabled>Create statement</button></div>
-  </div>
-  <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
-  <footer><span>A communication aid, not a diagnosis.</span></footer>
-</main>
-<script type="module" src="flow.js?v=tooth-preview-1"></script>
+        <div class="chat-actions">
+          <button id="retry" class="secondary" hidden>Retry</button>
+          <button id="use-manual" class="text-button" hidden>Continue without AI</button>
+          <button id="to-body" class="next-button" disabled>Next: show where it hurts <span aria-hidden="true">→</span></button>
+        </div>
+        <p id="privacy" class="privacy-note"></p>
+      </section>
+
+      <aside class="panel understood" id="understood" aria-labelledby="understood-title">
+        <h2 id="understood-title">What I’ve understood</h2>
+        <p class="panel-sub">Fills in as we talk.</p>
+        <ul id="understood-list"></ul>
+      </aside>
+
+      <section class="panel model-card" id="model-card" hidden aria-label="Body map">
+        <div class="model-top">
+          <button class="text-button" data-back="1"><span aria-hidden="true">←</span> Conversation</button>
+          <div class="segmented" role="tablist" aria-label="3D model type"><button id="body-tab" role="tab" aria-selected="true" aria-controls="body-map-panel" tabindex="0" data-model-tab="body">Body</button><button id="dental-tab" role="tab" aria-selected="false" aria-controls="dental-panel" tabindex="-1" data-model-tab="dental">Teeth</button></div>
+        </div>
+        <section id="body-map-panel" role="tabpanel" aria-labelledby="body-tab">
+          <p id="map-status" class="map-status" role="status"></p>
+          <iframe id="painter" title="Interactive body map. Paint where it hurts." src="painter.html?v=night-1"></iframe>
+        </section>
+        <section id="dental-panel" role="tabpanel" aria-labelledby="dental-tab" hidden>
+          <p id="dental-status" class="map-status" role="status"></p>
+          <section id="dental-count-question" class="count-question" hidden aria-labelledby="dental-count-title"><h3 id="dental-count-title">Count from</h3><div role="group" aria-label="Count teeth from the back"><button id="count-from-model" class="secondary" aria-pressed="false">Last tooth shown</button><button id="count-from-wisdom" class="secondary" aria-pressed="false">Wisdom tooth</button></div></section>
+          <button id="apply-dental" class="secondary small" hidden>Use the suggested teeth</button>
+          <iframe id="dental-model" data-src="dental-model/index.html?v=night-1" title="Interactive dental map: select a tooth or a tooth and its adjacent gum"></iframe>
+        </section>
+        <div class="pain">
+          <div class="pain-head"><span id="pain-title">How bad is it?</span><span id="score-label" class="score-label"></span></div>
+          <div id="score" class="pain-scale" role="radiogroup" aria-labelledby="pain-title"></div>
+          <div class="pain-ends" aria-hidden="true"><span>Mild</span><span>Worst</span></div>
+        </div>
+      </section>
+
+      <section class="live" id="details" hidden aria-labelledby="live-title">
+        <div class="live-head"><h2 id="live-title">For your doctor</h2><span class="live-dot" id="live-status">Updates as you paint</span></div>
+        <article class="note">
+          <label for="review-english" class="sr-only">Your description in English</label>
+          <textarea id="review-english" rows="4" maxlength="12000"></textarea>
+          <p id="review-note" class="note-help" hidden>Write your description in English. Manual mode does not translate.</p>
+          <div id="fields" class="fields" hidden></div>
+          <dl id="facts" class="facts"></dl>
+        </article>
+        <details class="original-notes"><summary>My original words</summary><div id="original" dir="auto"></div></details>
+        <button id="share" class="primary big"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Send to my phone</button>
+        <p class="share-hint">AirDrop or share two images: the body map and this note.</p>
+        <div class="actions"><button id="copy" class="secondary">Copy</button><button id="download" class="secondary">Download</button><button id="save-history" class="secondary">Save to log</button></div>
+        <div id="review-notice-slot"></div>
+      </section>
+    </div>
+    <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+    <footer class="disclaimer">A communication aid, not a diagnosis.</footer>
+  </main>
+</div>
+<script type="module" src="flow.js?v=night-1"></script>
 </body>
 </html>

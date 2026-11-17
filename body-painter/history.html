@@ -3,65 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f6f7f9">
-  <title>My symptom history · Say Well</title>
-  <link rel="stylesheet" href="flow.css?v=concise-1">
-  <link rel="stylesheet" href="history.css?v=history-clean-2">
+  <meta name="theme-color" content="#121a24">
+  <meta name="color-scheme" content="dark">
+  <title>Pain log · Say Well</title>
+  <link rel="stylesheet" href="flow.css?v=night-1">
+  <link rel="stylesheet" href="history.css?v=night-1">
 </head>
 <body class="history-page">
 <a class="skip-link" href="#page-title">Skip to main content</a>
-<header class="app-header">
-  <a class="brand" href="./" aria-label="Say Well home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M7 7h18v13H15l-8 6V7Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M11 13h10M11 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span>say well<span class="brand-dot">.</span></span></a>
-  <nav class="page-nav" aria-label="Pages"><a href="./" class="secondary">New description</a><a href="history.html" class="secondary is-current" aria-current="page">My history</a></nav>
-</header>
-<main>
-  <p id="demo-banner" class="demo-banner" hidden><strong>Sample data</strong> <a href="history.html">View my real history</a></p>
-  <div class="history-intro">
-    <h1 id="page-title" tabindex="-1">My history</h1>
-    
-  </div>
+<div class="app">
+  <aside class="sidebar" aria-label="Say Well">
+    <a class="brand" href="./">Say Well</a>
+    <a class="new-button" href="./">+ New description</a>
+    <nav class="recent" aria-labelledby="recent-title">
+      <h2 id="recent-title">Recent</h2>
+      <ol id="recent"></ol>
+    </nav>
+    <a class="side-link" href="history.html" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 6-8M3 21h18"/></svg>Pain log
+    </a>
+    <p class="side-note">Saved only on this device</p>
+  </aside>
 
-  <section id="empty" class="card history-empty-card" hidden>
-    <h2>No saved entries yet</h2>
-    <div class="actions"><a class="primary button-link" href="./">New description</a><a class="secondary" href="history.html?demo">See an example</a></div>
-  </section>
+  <header class="topbar">
+    <a class="brand" href="./">Say Well</a>
+    <a class="icon-link" href="./" aria-label="New description"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+  </header>
 
-  <div id="content" hidden>
-    <section class="stat-row" aria-label="Summary">
-      <div class="stat card"><span class="stat-label">Saved entries</span><b id="stat-total">0</b></div>
-      <div class="stat card"><span class="stat-label">Most frequent area</span><b id="stat-area">—</b></div>
-      <div class="stat card"><span class="stat-label">Most common season</span><b id="stat-season">—</b></div>
-      <div class="stat card"><span class="stat-label">Patterns noticed</span><b id="stat-patterns">0</b></div>
-    </section>
-
-
-    <section class="card insights" aria-labelledby="insights-title">
-      <div class="section-heading"><div><h2 id="insights-title">Patterns</h2></div></div>
-      <ul id="insight-list" class="insight-list"></ul>
-      <p class="field-help">Timing and frequency only. Not a diagnosis.</p>
-    </section>
-
-    <div class="history-grid">
-      <section class="card chart-card" aria-labelledby="month-title">
-        <h2 id="month-title">By month</h2>
-        <div class="month-chart" id="month-chart" role="img"></div>
-        <div class="season-row" id="season-row"></div>
-        <table class="sr-only" id="month-table"></table>
-      </section>
-      <section class="card chart-card" aria-labelledby="area-title">
-        <h2 id="area-title">By area</h2>
-        <ul class="area-chart" id="area-chart"></ul>
-      </section>
+  <main id="main">
+    <div class="page-head">
+      <h1 id="page-title" tabindex="-1">Pain log</h1>
+      <div class="segmented" id="range" role="group" aria-label="Time range" hidden>
+        <button type="button" data-range="year" aria-pressed="true">Past year</button>
+        <button type="button" data-range="all" aria-pressed="false">All time</button>
+      </div>
     </div>
+    <p id="demo-banner" class="demo-banner" hidden>Example data · <a href="history.html">Show my log</a></p>
 
-    <section aria-labelledby="timeline-title" class="timeline-section">
-      <div class="timeline-head"><div><h2 id="timeline-title">Saved descriptions</h2></div><div class="timeline-actions"><button id="export" class="secondary" type="button">Download all</button><button id="clear" class="text-button danger" type="button">Delete all history</button></div></div>
-      <div id="timeline"></div>
+    <section id="empty" class="panel empty" hidden>
+      <h2>Nothing saved yet</h2>
+      <p>After you describe a symptom, tap “Save to log”. Each entry builds a picture of where and when it hurts.</p>
+      <div class="empty-actions"><a class="primary" href="./">New description</a><a class="secondary" href="history.html?demo">See an example</a></div>
     </section>
-  </div>
-  <div id="tooltip" class="chart-tooltip" role="tooltip" hidden></div>
-  <footer><span>Saved only in this browser. A communication aid, not a diagnosis.</span></footer>
-</main>
-<script type="module" src="history-page.js?v=history-clean-2"></script>
+
+    <div id="content" hidden>
+      <div class="log-grid">
+        <section class="panel heat" aria-labelledby="heat-title">
+          <h2 id="heat-title">Where it hurts most</h2>
+          <div class="heat-figure" id="heat-figure"></div>
+          <ul class="heat-legend" id="heat-legend"></ul>
+        </section>
+        <section class="panel lanes" aria-labelledby="lanes-title">
+          <div class="lanes-head"><h2 id="lanes-title">When it happens</h2><span class="size-key" aria-hidden="true"><i class="k-mild"></i>mild<i class="k-severe"></i>severe</span></div>
+          <div id="lanes" class="lane-list"></div>
+          <div class="lane-axis"><span></span><div id="ticks" class="ticks"></div></div>
+        </section>
+      </div>
+      <div class="log-grid lower">
+        <div class="pattern-wrap"><section class="pattern" aria-labelledby="pattern-title"><h2 id="pattern-title">Pattern</h2><p id="pattern-text"></p></section></div>
+        <section class="panel entries" aria-labelledby="entries-title">
+          <div class="entries-head"><h2 id="entries-title">Entries</h2><div class="entries-actions"><button id="export" class="text-button" type="button">Download</button><button id="clear" class="text-button danger" type="button">Delete all</button></div></div>
+          <ol id="entries"></ol>
+        </section>
+      </div>
+    </div>
+    <footer class="disclaimer">Saved only in this browser. A communication aid, not a diagnosis.</footer>
+  </main>
+</div>
+<script type="module" src="history-page.js?v=night-1"></script>
 </body>
 </html>

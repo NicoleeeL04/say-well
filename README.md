@@ -39,15 +39,17 @@ Import the GitHub repository into Replit. The included `.replit` runs `HOST=0.0.
 
 ## Flow
 
-1. **Describe:** write in any language. With AI enabled, get one relevant follow-up in that language, a visible full English translation of each message, and a separate cumulative English account. You can skip further questions.
-2. **Show us where:** review and edit the complete English account, preserving symptom/location/time associations and explicit negatives. Approximate model markings use the bundled model’s bone weights for 24 regions, including hands, wrists, ankles and lower back. Automatic marks update after location corrections; hand-drawn corrections are preserved until explicitly replaced. Correct them using the existing paint, erase, undo, rotation, zoom and arm controls. Location labels remain editable and are independent of freehand marks. Users confirm both before proceeding.
-3. **Your statement:** generate and edit a first-person English statement alongside the same body map. Copy it or download self-contained HTML notes containing the statement, original words, location labels and a PNG of the current model view.
+1. **Describe:** write in any language. With AI enabled, Say Well asks one follow-up at a time in your language and shows the English translation of each message. On wide screens a "What I've understood" panel fills in as you talk (symptom, where, when it started, pattern, triggers).
+2. **Paint + live note:** paint where it hurts on the 3D body (or tap teeth on the dental model) and rate the pain 1–10. The white "For your doctor" note sits beside the model and updates as you paint: painted triangles are read back as body locations (for example "Right thigh · Right knee"), and changed rows are highlighted. The English text stays editable. **Send to my phone** shares two images (the note and the body map) through the system share sheet, so AirDrop works on Apple devices; browsers without file sharing download both images instead. Copy, Download (self-contained HTML) and Save to log are next to it.
+3. **Pain log:** saved entries show a body heat map (where it hurts most), a swimlane timeline per body area (dot size and colour = pain score; past year or all time) and plain-language patterns such as seasonal or recurring pain.
+
+The layout is responsive: phones get one column and a compact top bar; desktops get a sidebar with recent entries.
 
 No diagnosis or treatment is generated. Unknown details remain unspecified. The mapping is approximate, not anatomical measurement. Clinician review and a qualified interpreter may still be needed. This is a local prototype, not a deployment-ready clinical system.
 
 ## Data handling
 
-Conversations and drawings live in page memory and clear on refresh, unless you choose **Save to my history** (see below). The server does not save them or log request bodies. In AI mode, text is sent to OpenAI with `store: false`; provider processing and retention policies still apply. Drawings stay local. Downloaded notes contain symptom information and are saved only when requested. No analytics or external font dependencies are included.
+Conversations and drawings live in page memory and clear on refresh, unless you choose **Save to log** (see below). The server does not save them or log request bodies. In AI mode, text is sent to OpenAI with `store: false`; provider processing and retention policies still apply. Drawings stay local. Downloaded notes contain symptom information and are saved only when requested. No analytics or external font dependencies are included.
 
 ## My history (local only)
 

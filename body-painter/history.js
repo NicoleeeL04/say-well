@@ -24,7 +24,8 @@ function write(storage, records) {
   storage.setItem(HISTORY_KEY, JSON.stringify(records));
 }
 
-export function createRecord({id, statement, locations, areas, originals, model, image, now = new Date()}) {
+export function createRecord({id, statement, locations, areas, originals, model, image, score, now = new Date()}) {
+  const pain = Math.round(Number(score));
   return {
     id: id || `${now.getTime().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     savedAt: now.toISOString(),
@@ -34,6 +35,7 @@ export function createRecord({id, statement, locations, areas, originals, model,
     originals: (originals || []).map(o => ({original: String(o.original || ''), english: String(o.english || '')})),
     model: model === 'dental' ? 'dental' : 'body',
     image: typeof image === 'string' && image.startsWith('data:image/') ? image : '',
+    score: pain >= 1 && pain <= 10 ? pain : null,
   };
 }
 
@@ -170,6 +172,7 @@ export function sampleHistory() {
     ['2025-05-06T13:15', ['Both sides of my head'], ['head'], 'Pounding headache and itchy, watery eyes on high-pollen days.', '花粉多的时候头一跳一跳地疼，眼睛又痒又流泪。'],
     ['2025-04-22T18:30', ['Both sides of my head'], ['head'], 'Pressing headache on both sides, with sneezing and watery eyes.', '我两边头都胀痛，打喷嚏，眼睛流泪。'],
   ];
+  const scores = [6, 4, 7, 5, 4, 5, 6, 7, 6, 5];
   return items.map(([when, locations, areas, statement, original], i) =>
-    createRecord({id:`sample-${i}`, statement, locations, areas, originals:[{original, english:statement}], now:new Date(when)}));
+    createRecord({id:`sample-${i}`, statement, locations, areas, score: scores[i], originals:[{original, english:statement}], now:new Date(when)}));
 }

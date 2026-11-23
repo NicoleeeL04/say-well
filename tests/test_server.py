@@ -119,6 +119,29 @@ class ReplyLanguageTests(unittest.TestCase):
         self.assertEqual(server.script_language('牙很痛'), 'Chinese')
         self.assertEqual(server.script_language('Me duele'), '')
 
+
+class UrgentAndDoctorRetryTests(unittest.TestCase):
+    def test_urgent_flag_adds_the_emergency_instruction(self):
+        seen = []
+        def fake(key, messages, schema, name):
+            if name == 'original_translation': return {'source_language':'zh','translation':'Chest pain.'}
+            seen.append(messages)
+            return {'reply':'请立刻拨打911。','translation':'x','statement':'Chest pain.','ready':False,'dental':{'involved':False,'locations':[]},'details':dict.fromkeys(server.FIELDS,''),'regions':[]}
+        with patch.object(server,'model_json',side_effect=fake):
+            server.interpret('k',[{'role':'user','content':'胸口疼，喘不过气'}], urgent=True)
+        self.assertTrue(any('911' in m['content'] for m in seen[0] if m['role'] == 'system'))
+
+    def test_cut_off_doctor_translation_is_retried(self):
+        doc = 'Take ibuprofen 400 mg twice a day with food for 5 days. Ice it after workouts. Come back in two weeks.'
+        replies = iter([{'translation':'可能是炎症。'}, {'translation':'每天两次服用布洛芬400毫克，饭后服用，连续5天。运动后冰敷。两周后复诊。'}])
+        base = {'medications':[],'follow_up':'','return_if':'','other':'','labels':{'title':'医生说','medications':'药','follow_up':'复诊','return_if':'尽早','other':'其他'}}
+        calls = []
+        def fake(key, messages, schema, name): calls.append(messages); return {**base, **next(replies)}
+        with patch.object(server,'model_json',side_effect=fake):
+            out = server.doctor_reply('k', doc, 'Chinese')
+        self.assertEqual(len(calls), 2)
+        self.assertIn('两周后复诊', out['translation'])
+
 if __name__=='__main__':unittest.main()
 
 

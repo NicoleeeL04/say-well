@@ -142,7 +142,11 @@ def reply_matches(reply, language):
     return script_language(reply) == language or bool(re.search(dict(SCRIPTS)[language], reply))
 
 
-def interpret(key, messages):
+EMERGENCY_HINT = ('The patient describes possible emergency warning signs. In reply, first tell them clearly to call 911 '
+                  '(or local emergency services) or go to the emergency room now, in their language. Do not ask routine questions. ready=false.')
+
+
+def interpret(key, messages, urgent=False):
     # Isolate literal translation from conversation/summary generation so helper
     # questions and corrected history cannot leak into the original translation.
     latest = next(m['content'] for m in reversed(messages) if m['role'] == 'user')
@@ -150,6 +154,8 @@ def interpret(key, messages):
     system = [{'role':'system','content':PROMPT}]
     if language:
         system.append({'role':'system','content':f'The patient is writing in {language}. Write "reply" in {language} only.'})
+    if urgent:
+        system.append({'role':'system','content':EMERGENCY_HINT})
     with ThreadPoolExecutor(max_workers=2) as pool:
         translation = pool.submit(model_json, key,
                                   [{'role':'system','content':TRANSLATION_PROMPT},
@@ -172,7 +178,14 @@ def interpret(key, messages):
 
 def doctor_reply(key, text, language):
     prompt = DOCTOR_PROMPT.replace('{language}', language)
-    return validate_doctor(model_json(key, [{'role':'system','content':prompt}, {'role':'user','content':text}], DOCTOR_SCHEMA, 'doctor_reply'))
+    messages = [{'role':'system','content':prompt}, {'role':'user','content':text}]
+    result = validate_doctor(model_json(key, messages, DOCTOR_SCHEMA, 'doctor_reply'))
+    # Small models sometimes translate only the first sentence. Chinese/Japanese run about
+    # a third of the English length, so anything under a fifth is a cut-off translation.
+    if len(result['translation']) < len(text) * 0.2:
+        messages.append({'role':'system','content':'Your translation stopped early. Translate every sentence in full.'})
+        result = validate_doctor(model_json(key, messages, DOCTOR_SCHEMA, 'doctor_reply'))
+    return result
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self,*args,**kwargs):
@@ -221,7 +234,7 @@ class Handler(SimpleHTTPRequestHandler):
                 if not isinstance(message,dict) or message.get('role') not in ('user','assistant') or not isinstance(message.get('content'),str) or not 0<len(message['content'])<=4000:
                     raise ValueError('Invalid message')
             clean_messages=[{'role':m['role'],'content':m['content']} for m in messages]
-            return self.send_json(200,interpret(key,clean_messages))
+            return self.send_json(200,interpret(key,clean_messages,urgent=data.get('urgent') is True))
         except (ValueError,TypeError,AttributeError):
             return self.send_json(400,{'error':'The request or interpretation was incomplete. Please try again or enter details manually.'})
         except (URLError,TimeoutError,KeyError,IndexError,StopIteration,json.JSONDecodeError) as error:

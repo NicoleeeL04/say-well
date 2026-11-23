@@ -161,7 +161,7 @@ function bodyAreas() {
   return [...bodyRegions().map(r => regionLabel(r.region)), ...((dental()?.getState().selections || []).length ? ['teeth & gums'] : [])];
 }
 // Drop stray separators the AI sometimes leaves at either end ("; 2 days ago").
-const tidy = value => String(value ?? '').replace(/^[\s;,.:·、；，。：]+|[\s;,:·、；，：]+$/g, '').trim();
+const tidy = value => [...new Set(String(value ?? '').split(/\s*[;；]\s*/).map(part => part.replace(/^[\s,.:·、，。：]+|[\s,:·、，：]+$/g, '').trim()).filter(Boolean))].join('; ');
 let lastFacts = {};
 function renderFacts() {
   const rows = [
@@ -337,7 +337,7 @@ async function interpret() {
   try {
     const response = await fetch('/api/interpret', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages}), signal:AbortSignal.timeout(65000),
+      body:JSON.stringify({messages, urgent:Boolean(redFlag(...translations.map(t => t.original)))}), signal:AbortSignal.timeout(65000),
     });
     const data = await response.json();
     if (!response.ok) throw Error(data.error || 'Translation is unavailable right now.');
@@ -357,7 +357,8 @@ async function interpret() {
     renderUnderstood();
     const replies = messages.filter(m => m.role === 'assistant').length;
     const asking = /[?？؟]\s*$/.test(data.reply.trim());
-    showContinue(valid && ((data.ready === true && !asking) || replies >= 4));
+    // The first reply that still asks a question is too early; after that, trust ready.
+    showContinue(valid && ((data.ready === true && (!asking || replies >= 2)) || replies >= 3));
   } catch (error) {
     interpretationFailed = true;
     $('retry').hidden = false;

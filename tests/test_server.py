@@ -86,6 +86,39 @@ class DoctorReplyTests(unittest.TestCase):
     def test_blank_medication_names_are_dropped(self):
         self.assertEqual(server.validate_doctor(self.reply(medications=[{'name':' ','instructions':'x'}]))['medications'],[])
 
+
+class ReplyLanguageTests(unittest.TestCase):
+    def result(self, reply):
+        return {'reply':reply,'translation':'x','statement':'My tooth hurts.','ready':False,'dental':{'involved':True,'locations':[]},'details':dict.fromkeys(server.FIELDS,''),'regions':[]}
+
+    def test_wrong_reply_language_is_retried_once_with_a_firm_hint(self):
+        calls = []
+        def fake(key, messages, schema, name):
+            if name == 'original_translation': return {'source_language':'zh','translation':'My tooth hurts.'}
+            calls.append(messages)
+            return self.result('Вы упомянули зуб?' if len(calls) == 1 else '是哪一颗牙疼？')
+        with patch.object(server,'model_json',side_effect=fake):
+            out = server.interpret('k',[{'role':'user','content':'牙很痛'}])
+        self.assertEqual(out['reply'], '是哪一颗牙疼？')
+        self.assertEqual(len(calls), 2)
+        self.assertIn('Chinese', calls[0][1]['content'])
+        self.assertIn('not in Chinese', calls[1][2]['content'])
+
+    def test_latin_script_input_gets_no_forced_language(self):
+        calls = []
+        def fake(key, messages, schema, name):
+            if name == 'original_translation': return {'source_language':'es','translation':'It hurts.'}
+            calls.append(messages); return self.result('¿Desde cuándo?')
+        with patch.object(server,'model_json',side_effect=fake):
+            server.interpret('k',[{'role':'user','content':'Me duele mucho'}])
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(len([m for m in calls[0] if m['role'] == 'system']), 1)
+
+    def test_script_detection(self):
+        self.assertEqual(server.script_language('歯が痛い'), 'Japanese')
+        self.assertEqual(server.script_language('牙很痛'), 'Chinese')
+        self.assertEqual(server.script_language('Me duele'), '')
+
 if __name__=='__main__':unittest.main()
 
 

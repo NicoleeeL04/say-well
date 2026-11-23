@@ -335,7 +335,8 @@ async function interpret() {
     checkRedFlags(data.statement);
     renderUnderstood();
     const replies = messages.filter(m => m.role === 'assistant').length;
-    showContinue(valid && (data.ready === true || replies >= 4));
+    const asking = /[?？؟]\s*$/.test(data.reply.trim());
+    showContinue(valid && ((data.ready === true && !asking) || replies >= 4));
   } catch (error) {
     interpretationFailed = true;
     $('retry').hidden = false;

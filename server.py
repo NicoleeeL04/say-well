@@ -2,6 +2,7 @@
 (or OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:7b for a local model)."""
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -118,17 +119,47 @@ def log_upstream_error(error):
         pass
 
 
+# Scripts that identify the language on their own. Latin-script languages are left to the model.
+SCRIPTS = [('Japanese', r'[\u3040-\u30ff]'), ('Korean', r'[\uac00-\ud7af\u1100-\u11ff]'),
+           ('Chinese', r'[\u4e00-\u9fff\u3400-\u4dbf]'), ('Russian', r'[\u0400-\u04ff]'),
+           ('Arabic', r'[\u0600-\u06ff]'), ('Hindi', r'[\u0900-\u097f]'), ('Thai', r'[\u0e00-\u0e7f]'),
+           ('Hebrew', r'[\u0590-\u05ff]'), ('Greek', r'[\u0370-\u03ff]')]
+
+
+def script_language(text):
+    # Japanese is checked first: it mixes kana with Chinese characters.
+    for name, pattern in SCRIPTS:
+        if re.search(pattern, text or ''):
+            return name
+    return ''
+
+
+def reply_matches(reply, language):
+    if not language:
+        return True
+    if language == 'Japanese':
+        return bool(re.search(r'[\u3040-\u30ff]', reply))
+    return script_language(reply) == language or bool(re.search(dict(SCRIPTS)[language], reply))
+
+
 def interpret(key, messages):
     # Isolate literal translation from conversation/summary generation so helper
     # questions and corrected history cannot leak into the original translation.
     latest = next(m['content'] for m in reversed(messages) if m['role'] == 'user')
+    language = script_language(latest)
+    system = [{'role':'system','content':PROMPT}]
+    if language:
+        system.append({'role':'system','content':f'The patient is writing in {language}. Write "reply" in {language} only.'})
     with ThreadPoolExecutor(max_workers=2) as pool:
         translation = pool.submit(model_json, key,
                                   [{'role':'system','content':TRANSLATION_PROMPT},
                                    {'role':'user','content':latest}],
                                   TRANSLATION_SCHEMA, 'original_translation')
-        result = model_json(key, [{'role':'system','content':PROMPT}]+messages,
-                            SCHEMA, 'symptom_interpretation')
+        result = model_json(key, system+messages, SCHEMA, 'symptom_interpretation')
+        if not reply_matches(str(result.get('reply', '')), language):
+            # Wrong reply language (seen with small models): ask once more, firmly.
+            retry = system+[{'role':'system','content':f'Your previous reply was not in {language}. The patient cannot read it. Reply in {language}.'}]
+            result = model_json(key, retry+messages, SCHEMA, 'symptom_interpretation')
         translated = translation.result()
         # English needs no translation: preserve it verbatim instead of allowing
         # a translation model to paraphrase or accidentally switch languages.

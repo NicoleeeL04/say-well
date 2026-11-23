@@ -1,10 +1,10 @@
-# Say Well
+# In My Words
 
 A symptom communication tool for people who find it easier to describe how they feel in a language other than English. Built on the `UI/UX` branch's 3D body painter.
 
 ## Evaluation
 
-Say Well is evaluated for **faithfulness**: the English must keep every location, timing, "no" and "not sure" the student gave, and add nothing. On 14 synthetic scenarios in 7 languages (Chinese, Spanish, Arabic, Japanese, French, Hindi, English), the first run dropped explicit negatives and leaked source-language text. After fixes, **14/14 passed**, including corrections, prompt injection, vague input with no invented location, and posterior knee. 61/61 deterministic unit tests pass. Methods, metrics, limitations and how to reproduce: [docs/EVALUATION.md](docs/EVALUATION.md).
+In My Words is evaluated for **faithfulness**: the English must keep every location, timing, "no" and "not sure" the student gave, and add nothing. On 14 synthetic scenarios in 7 languages (Chinese, Spanish, Arabic, Japanese, French, Hindi, English), the first run dropped explicit negatives and leaked source-language text. After fixes, **14/14 passed**, including corrections, prompt injection, vague input with no invented location, and posterior knee. 61/61 deterministic unit tests pass. Methods, metrics, limitations and how to reproduce: [docs/EVALUATION.md](docs/EVALUATION.md).
 
 ## Run locally
 
@@ -39,7 +39,7 @@ Import the GitHub repository into Replit. The included `.replit` runs `HOST=0.0.
 
 ## Flow
 
-1. **Describe:** write in any language. With AI enabled, Say Well asks one follow-up at a time in your language and shows the English translation of each message. On wide screens a "What I've understood" panel fills in as you talk (symptom, where, when it started, pattern, triggers).
+1. **Describe:** write in any language. With AI enabled, In My Words asks one follow-up at a time in your language and shows the English translation of each message. On wide screens a "What I've understood" panel fills in as you talk (symptom, where, when it started, pattern, triggers).
 2. **Paint + live note:** paint where it hurts on the 3D body (or tap teeth on the dental model) and rate the pain 1–10. The white "For your doctor" note sits beside the model and updates as you paint: painted triangles are read back as body locations (for example "Right thigh · Right knee"), and changed rows are highlighted. The English text stays editable. **Send to my phone** shares two images (the note and the body map) through the system share sheet, so AirDrop works on Apple devices; browsers without file sharing download both images instead. Copy, Download (self-contained HTML) and Save to log are next to it.
 3. **Pain log:** saved entries show a body heat map (where it hurts most), a swimlane timeline per body area (dot size and colour = pain score; past year or all time) and plain-language patterns such as seasonal or recurring pain.
 
@@ -59,7 +59,7 @@ Conversations and drawings live in page memory and clear on refresh, unless you 
 
 ## My history (local only)
 
-Say Well keeps a private symptom diary, so students can look back and notice patterns, such as headaches that come back every spring or knee pain every winter, and bring that to an appointment.
+In My Words keeps a private symptom diary, so students can look back and notice patterns, such as headaches that come back every spring or knee pain every winter, and bring that to an appointment.
 
 - **Save:** on the statement step, **Save to my history** stores the date and time, body areas and teeth, the English statement, the original words and translations, and a small picture of the model view. Saving again during the same visit updates that entry.
 - **My history page** (`/history.html`, linked in the header): summary stats, plain-language **patterns noticed** (an area logged 3+ times with at least 60% of entries in one season is flagged as possibly seasonal; otherwise, 3+ different months is flagged as recurring), entries by month of the year and by season, body-area frequency (click to filter), filters by area, time period and words in any language, and a month-by-month timeline. Delete one, delete all, or download the filtered entries plus patterns as an HTML file.

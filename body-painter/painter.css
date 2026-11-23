@@ -4,7 +4,7 @@
 @media(max-width:760px){.btn,.more-tools summary{min-height:44px}}
 
 
-/* Night theme, matching the Say Well page around this frame. */
+/* Night theme, matching the In My Words page around this frame. */
 body{background:transparent;color:#9AA6B4;padding:0;color-scheme:dark}
 .btn{background:#2A3A4F;color:#EDF2F7;border-color:transparent;border-radius:12px;min-height:40px;padding:0 14px;font-size:14px}
 .mode-buttons{background:#131D29;border-radius:14px;padding:4px;gap:4px}

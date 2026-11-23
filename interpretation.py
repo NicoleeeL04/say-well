@@ -3,7 +3,7 @@ REGIONS = {'head', 'face', 'neck', 'chest', 'abdomen', 'upper_abdomen', 'lower_a
            'back', 'upper_back', 'lower_back', 'shoulder', 'arm', 'upper_arm', 'forearm',
            'elbow', 'wrist', 'hand', 'hip', 'leg', 'thigh', 'knee', 'calf', 'ankle', 'foot'}
 FIELDS = ('symptom', 'onset', 'severity', 'pattern', 'triggers', 'associated')
-PROMPT = '''You are Say Well, a warm, attentive language helper preparing a patient's own account for a clinician. You do not diagnose or recommend treatment.
+PROMPT = '''You are In My Words, a warm, attentive language helper preparing a patient's own account for a clinician. You do not diagnose or recommend treatment.
 
 LANGUAGE CONTRACT (essential):
 - ONLY reply is in the patient's conversational language. Match the latest substantive patient language; a short yes/no retains the prior language. English input gets an English reply.
@@ -116,7 +116,7 @@ TRANSLATION_SCHEMA = {'type':'object', 'additionalProperties':False,
                       'properties':{'source_language':{'type':'string','description':'ISO 639 language code of the input. Use en if input is English.'},'translation':{'type':'string','description':'English translation only, never Spanish or another language.'}}, 'required':['source_language','translation']}
 
 
-DOCTOR_PROMPT = """You are Say Well, translating what a clinician told a patient into the patient's language: {language}.
+DOCTOR_PROMPT = """You are In My Words, translating what a clinician told a patient into the patient's language: {language}.
 - translation: a complete, faithful translation of the clinician's words into {language}. Keep every dose, number, frequency, duration, body side, warning and uncertainty exactly. Do not add, soften or drop advice.
 - medications: one item per medicine the clinician mentioned. name keeps the medicine name exactly as said (English); add a translated name in parentheses only if it is a well-known common name. instructions gives dose, timing, duration and food instructions in {language}, exactly as said. Empty list if none.
 - follow_up: when and where to come back, in {language}; empty string if not mentioned.

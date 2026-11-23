@@ -1,6 +1,6 @@
 # Evaluation
 
-Say Well is a communication aid. It does not diagnose, so we evaluate **faithfulness**, not clinical accuracy. Faithfulness means the English the clinician reads should contain exactly what the student said: the same body location, the same timing, and every "no" and "not sure", and nothing the student did not say.
+In My Words is a communication aid. It does not diagnose, so we evaluate **faithfulness**, not clinical accuracy. Faithfulness means the English the clinician reads should contain exactly what the student said: the same body location, the same timing, and every "no" and "not sure", and nothing the student did not say.
 
 All inputs are synthetic. No real patient data was used. Results below were recorded during development on November 14–15, 2026.
 

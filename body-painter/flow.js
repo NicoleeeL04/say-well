@@ -255,7 +255,7 @@ function bubble(role, text) {
   const div = document.createElement('div');
   div.className = `message ${role}`;
   div.dir = 'auto';
-  const author = Object.assign(document.createElement('span'), {className:'sr-only', textContent:role === 'user' ? 'You: ' : 'Say Well: '});
+  const author = Object.assign(document.createElement('span'), {className:'sr-only', textContent:role === 'user' ? 'You: ' : 'In My Words: '});
   const content = Object.assign(document.createElement('div'), {className:'message-content', textContent:text});
   div.append(author, content);
   $('messages').append(div);
@@ -402,7 +402,7 @@ async function noteImage() {
     y += lines.length * 46 + 10;
   }
   ctx.fillStyle = '#5B6672'; ctx.font = `400 26px ${font}`;
-  ctx.fillText('Made with Say Well · Patient-reviewed · Not a diagnosis', pad, H - 50);
+  ctx.fillText('Made with In My Words · Patient-reviewed · Not a diagnosis', pad, H - 50);
   return canvas.toDataURL('image/png');
 }
 async function modelImage() {
@@ -421,13 +421,13 @@ const toFile = async (url, name) => new File([await (await fetch(url)).blob()], 
 function downloadURL(url, name) { Object.assign(document.createElement('a'), {href:url, download:name}).click(); }
 $('share').onclick = async () => {
   const [note, model] = await Promise.all([noteImage(), modelImage().catch(() => null)]);
-  const files = [await toFile(note, 'say-well-note.png'), ...(model ? [await toFile(model, 'say-well-body-map.png')] : [])];
+  const files = [await toFile(note, 'in-my-words-note.png'), ...(model ? [await toFile(model, 'in-my-words-body-map.png')] : [])];
   if (navigator.canShare?.({files})) {
     try { await navigator.share({files, title:'For my doctor'}); notice('Shared.'); return; }
     catch (error) { if (error.name === 'AbortError') return; }
   }
-  downloadURL(note, 'say-well-note.png');
-  if (model) setTimeout(() => downloadURL(model, 'say-well-body-map.png'), 300);
+  downloadURL(note, 'in-my-words-note.png');
+  if (model) setTimeout(() => downloadURL(model, 'in-my-words-body-map.png'), 300);
   notice('This browser can’t share files, so both images were downloaded.');
 };
 $('copy').onclick = async () => {

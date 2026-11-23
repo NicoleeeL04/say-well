@@ -60,9 +60,9 @@ Three.js：MIT，见 THREE-LICENSE.txt。
 - 鼠标移动按显示帧合并，抬笔时补齐最后一段；同帧仅渲染一次。
 - 保留原模型与 2048×2048 涂色纹理，关闭每次绘制时不必要的 mipmap 生成。
 
-## Say Well integration
+## In My Words integration
 
-`index.html` is now the three-stage Say Well app. Use `painter.html` for standalone embedding (replace the old iframe URL above). Existing `getState()` / `setState()` behavior is preserved. Two additional methods are available after loading:
+`index.html` is now the three-stage In My Words app. Use `painter.html` for standalone embedding (replace the old iframe URL above). Existing `getState()` / `setState()` behavior is preserved. Two additional methods are available after loading:
 
 ```js
 component.markRegions([{ region: 'knee', side: 'left' }]);

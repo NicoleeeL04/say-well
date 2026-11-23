@@ -5,7 +5,7 @@
 footer{bottom:12px;overflow-wrap:anywhere}.bottom{bottom:76px}.hint{padding-inline:6px}.status{bottom:200px}.zoom{bottom:200px}
 
 
-/* Night theme, matching the Say Well page around this frame. */
+/* Night theme, matching the In My Words page around this frame. */
 body{background:radial-gradient(70% 55% at 50% 42%,#22324A,#1C2938);color:#EDF2F7}
 h1{color:#EDF2F7;font-weight:600;letter-spacing:0;font-size:16px}
 header p,.hint,.status,#status,footer,.side,#loading{color:#9AA6B4}

@@ -1,4 +1,4 @@
-# Say Well UI/UX redesign
+# In My Words UI/UX redesign
 
 Implemented by a UI/UX designer sub-agent using the user-supplied `skills-main` principles from `emil-design-eng`, `apple-design`, and `mobile-native`.
 

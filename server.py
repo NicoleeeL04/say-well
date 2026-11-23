@@ -1,4 +1,4 @@
-"""Local Say Well server. Run: OPENAI_API_KEY=... python3 server.py
+"""Local In My Words server. Run: OPENAI_API_KEY=... python3 server.py
 (or OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:7b for a local model)."""
 import json
 import os
@@ -202,5 +202,5 @@ if __name__=='__main__':
     port=int(os.environ.get('PORT','8080'))
     # Local by default; hosting platforms set HOST=0.0.0.0 to accept outside traffic.
     host=os.environ.get('HOST','127.0.0.1')
-    print(f'Say Well: http://localhost:{port} (AI {"off" if not ai_configured() else "on via "+ai_base_url()})')
+    print(f'In My Words: http://localhost:{port} (AI {"off" if not ai_configured() else "on via "+ai_base_url()})')
     ThreadingHTTPServer((host,port),Handler).serve_forever()

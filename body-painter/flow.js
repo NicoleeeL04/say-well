@@ -262,6 +262,20 @@ function bubble(role, text) {
   div.scrollIntoView({block:'nearest'});
   return div;
 }
+// Inline "Continue" under the last reply once the AI has enough (or after a few turns).
+function showContinue(show) {
+  $('inline-continue')?.remove();
+  $('to-body').hidden = show;
+  if (!show) return;
+  const wrap = Object.assign(document.createElement('div'), {id:'inline-continue', className:'message-cta'});
+  const button = Object.assign(document.createElement('button'), {type:'button', className:'cta-continue'});
+  button.append('Continue', Object.assign(document.createElement('span'), {ariaHidden:'true', textContent:' →'}));
+  button.onclick = () => changeStep(2);
+  const hint = Object.assign(document.createElement('span'), {className:'cta-hint', textContent:'Next: show where it hurts. You can still add more details here first.'});
+  wrap.append(button, hint);
+  $('messages').append(wrap);
+  wrap.scrollIntoView({block:'nearest', behavior:'smooth'});
+}
 function showTranslation(text) {
   const disclosure = document.createElement('details');
   disclosure.className = 'message-translation';
@@ -320,6 +334,8 @@ async function interpret() {
     interpretationFailed = false;
     checkRedFlags(data.statement);
     renderUnderstood();
+    const replies = messages.filter(m => m.role === 'assistant').length;
+    showContinue(valid && (data.ready === true || replies >= 4));
   } catch (error) {
     interpretationFailed = true;
     $('retry').hidden = false;
@@ -347,6 +363,7 @@ $('chat-form').onsubmit = async event => {
   if (messages.length >= 30) { notice('This conversation is full. Go to the next step.'); return; }
   messages.push({role:'user', content:text});
   translations.push({original:text, english:''});
+  showContinue(false);
   lastUserBubble = bubble('user', text);
   checkRedFlags();
   $('description').value = '';

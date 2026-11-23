@@ -1,4 +1,4 @@
-import {dentalSuggestions,relativeToothPosition} from './dental-regions.js?v=tooth-preview-1';
+import {dentalSuggestions,relativeToothPosition} from './dental-regions.js?v=tooth-preview-2';
 import {activeModel,dental,setDentalReadOnly,notifyModelVisibility,selectModel} from './model-switcher.js';
 import {FIELDS,escapeHTML} from './symptoms.js';
 import {regionLabel,regionText} from './regions.js';
@@ -70,6 +70,7 @@ async function syncDental(force = false) {
   updateDentalCountQuestion(suggestion);
   $('dental-status').textContent = suggestion.needsCount ? 'Counted without wisdom teeth. Check the tooth.'
     : suggestion.needsManual ? 'Tap the tooth that hurts.'
+    : suggestion.proxies?.size ? 'Wisdom teeth aren’t in the model, so the molar in front of it is marked. Your note says wisdom tooth.'
     : suggestion.unsupported ? 'Wisdom teeth aren’t shown; your description keeps the detail.'
     : suggestion.selections.length ? suggestion.uncertain ? 'Suggested area. Tap the exact tooth.' : 'Check the marked tooth. Left and right are your own sides.'
     : dentalReport.involved ? 'Tap the tooth that hurts.' : '';
@@ -132,15 +133,35 @@ async function syncMap() {
 
 // ---------- locations, facts, live card ----------
 const sentence = text => text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
-function bodyLocations() { return (painted ?? regions).map(r => sentence(regionText(r))); }
+// Body areas for the note. With a toothache, the AI often adds the face as well; keep it only
+// when the person mentions the face, cheek or swelling. Front/back copies of one area count once.
+function bodyRegions() {
+  const list = painted ?? regions;
+  const faceMentioned = /\b(face|cheek|swell|swollen|jaw)/i.test($('review-english').value);
+  const seen = new Set();
+  return list.filter(r => {
+    if (dentalReport.involved && ['face','head'].includes(r.region) && !faceMentioned) return false;
+    const key = `${r.region}|${r.side}`;
+    if (seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+}
+function bodyLocations() { return bodyRegions().map(r => sentence(regionText(r))); }
 function teethLocations() {
-  const candidate = !dentalManual && currentDentalSuggestion().uncertain;
-  return (dental()?.getState().selections || []).map(s => `${candidate ? 'Possibly tooth' : 'Tooth'} ${s.tooth} (${s.label})${s.includesGum ? ' and gum' : ''}`);
+  const suggestion = currentDentalSuggestion();
+  const candidate = !dentalManual && suggestion.uncertain;
+  return (dental()?.getState().selections || []).map(s => {
+    const proxy = !dentalManual && suggestion.proxies?.get(s.tooth);
+    if (proxy) return `${sentence(proxy.jaw)} ${proxy.side} wisdom tooth (marked next to tooth ${s.tooth})`;
+    return `${candidate ? 'Possibly tooth' : 'Tooth'} ${s.tooth} (${s.label})${s.includesGum ? ' and gum' : ''}`;
+  });
 }
 function locationLabels() { return [...bodyLocations(), ...teethLocations()]; }
 function bodyAreas() {
-  return [...(painted ?? regions).map(r => regionLabel(r.region)), ...((dental()?.getState().selections || []).length ? ['teeth & gums'] : [])];
+  return [...bodyRegions().map(r => regionLabel(r.region)), ...((dental()?.getState().selections || []).length ? ['teeth & gums'] : [])];
 }
+// Drop stray separators the AI sometimes leaves at either end ("; 2 days ago").
+const tidy = value => String(value ?? '').replace(/^[\s;,.:·、；，。：]+|[\s;,:·、；，：]+$/g, '').trim();
 let lastFacts = {};
 function renderFacts() {
   const rows = [
@@ -150,7 +171,7 @@ function renderFacts() {
     ['Pattern', details.pattern],
     ['Worse or better with', details.triggers],
     ['Also noticed', details.associated],
-  ].filter(([, value]) => value && value.trim());
+  ].map(([key, value]) => [key, tidy(value)]).filter(([, value]) => value);
   const card = profileRows(loadProfile());
   const fromCard = new Set(card.map(([key]) => key));
   rows.push(...card);

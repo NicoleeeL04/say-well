@@ -6,7 +6,15 @@ const suggest=patch=>dentalSuggestions({involved:true,locations:[{...location,..
 test('upper-left back symptoms select only the candidate quadrant',()=>{const r=suggest({jaw:'upper',side:'left',area:'back'});assert.deepEqual(r.selections.map(s=>s.tooth),[24,25,26,27]);assert.equal(r.uncertain,true);});
 test('exact FDI tooth with gum does not mark neighboring teeth',()=>{assert.deepEqual(suggest({tooth:46,includesGum:true}).selections,[{tooth:46,includesGum:true}]);});
 test('unknown dental location does not select every tooth',()=>{assert.deepEqual(suggest({}).selections,[]);});
-test('wisdom tooth never marks a substitute molar',()=>{for(const p of [{tooth:48},{area:'wisdom',jaw:'lower',side:'left'}]){const r=suggest(p);assert.deepEqual(r.selections,[]);assert.equal(r.unsupported,true);}});
+test('wisdom tooth marks the molar in front of it as a labelled stand-in',()=>{
+  for(const [p,tooth] of [[{tooth:48},47],[{area:'wisdom',jaw:'lower',side:'left'},37],[{area:'wisdom',jaw:'upper',side:'right'},17]]){
+    const r=suggest(p);
+    assert.deepEqual(r.selections,[{tooth,includesGum:true}]);
+    assert.equal(r.unsupported,true);
+    assert.equal(r.proxies.get(tooth).wisdom,tooth+1);
+  }
+});
+test('wisdom tooth with unknown side marks nothing and asks',()=>{const r=suggest({area:'wisdom',jaw:'lower',side:'unspecified'});assert.deepEqual(r.selections,[]);assert.equal(r.needsManual,true);});
 test('correction recomputes candidates on the new side only',()=>{assert.ok(suggest({jaw:'lower',side:'right',area:'back'}).selections.every(s=>s.tooth>=44));assert.ok(suggest({jaw:'lower',side:'left',area:'back'}).selections.every(s=>s.tooth>=34&&s.tooth<=37));});
 
 const ordinalText='Since yesterday, my upper left second-to-last tooth and the gum around it have been painful, swollen, and inflamed.';

@@ -38,10 +38,25 @@ export function dentalSuggestions(dental, {text = '', countFrom = null} = {}) {
   const relative = relativeToothPosition(text);
   const reference = relative.reference || countFrom;
   let uncertain = false, unsupported = false, needsCount = false, needsManual = false;
+  const proxies = new Map(); // displayed tooth -> wisdom tooth it stands in for
+  // The model has no wisdom teeth: mark the last molar and its gum, which sit right in
+  // front of it, and remember that it stands in for the wisdom tooth (never a plain "tooth 47").
+  function wisdomProxy(jaw, side, includesGum) {
+    if (!['upper','lower'].includes(jaw) || !['left','right'].includes(side)) { needsManual = true; return; }
+    const quadrant = jaw === 'upper' ? side === 'right' ? 1 : 2 : side === 'left' ? 3 : 4;
+    const tooth = quadrant * 10 + 7;
+    selected.set(tooth, {tooth, includesGum:true});
+    proxies.set(tooth, {jaw, side, wisdom:quadrant * 10 + 8});
+  }
   for (const location of dental.locations) {
-    if (location.area === 'wisdom') { unsupported = true; continue; }
+    if (location.area === 'wisdom') { unsupported = true; wisdomProxy(location.jaw, location.side, location.includesGum); continue; }
     if (location.tooth) {
-      if (location.tooth % 10 === 8) { unsupported = true; continue; }
+      if (location.tooth % 10 === 8) {
+        unsupported = true;
+        const q = Math.floor(location.tooth / 10);
+        wisdomProxy(q <= 2 ? 'upper' : 'lower', [1,4].includes(q) ? 'right' : 'left', location.includesGum);
+        continue;
+      }
       selected.set(location.tooth, {tooth:location.tooth, includesGum:location.includesGum});
       continue;
     }
@@ -81,5 +96,5 @@ export function dentalSuggestions(dental, {text = '', countFrom = null} = {}) {
       }
     }
   }
-  return {selections:[...selected.values()], uncertain, unsupported, needsCount, needsManual};
+  return {selections:[...selected.values()], proxies, uncertain, unsupported, needsCount, needsManual};
 }
